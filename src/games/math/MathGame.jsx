@@ -18,7 +18,7 @@ export default function MathGame() {
   // timer
   const [time, setTime] = useState(10);
 
-  // auto difficulty counters
+  // auto level counters
   const [streak, setStreak] = useState(0);
   const [mistakes, setMistakes] = useState(0);
 
@@ -41,12 +41,33 @@ export default function MathGame() {
     setTime(10);
   }
 
+  function saveScoreToDb(scoreToSend, totalToSend, levelToSend) {
+    fetch("http://localhost:3001/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        user: "test",
+        score: scoreToSend,
+        total: totalToSend,
+        level: levelToSend,
+      }),
+    })
+      .then((r) => r.text())
+      .then((txt) => console.log("API RESPONSE:", txt))
+      .catch((e) => console.log("FETCH ERROR:", e));
+  }
+
   function checkAnswer() {
+    const correct = Number(input) === q.answer;
+
+    const newTotal = total + 1;
+    const newScore = correct ? score + 1 : score;
+
     setTotal((t) => t + 1);
 
-    if (Number(input) === q.answer) {
+    if (correct) {
       setScore((s) => s + 1);
-      setMsg("✅ Richtig");
+      setMsg("Richtig");
 
       if (autoLevel) {
         setMistakes(0);
@@ -60,7 +81,7 @@ export default function MathGame() {
         });
       }
     } else {
-      setMsg("❌ Falsch (Antwort: " + q.answer + ")");
+      setMsg("Falsch (Antwort: " + q.answer + ")");
 
       if (autoLevel) {
         setStreak(0);
@@ -75,13 +96,16 @@ export default function MathGame() {
       }
     }
 
+    // send to DB
+    saveScoreToDb(newScore, newTotal, level);
+
     setTimeout(() => {
       setMsg("");
       nextQuestion();
     }, 800);
   }
 
-  // Timer: simple interval
+  // Timer
   useEffect(() => {
     const interval = setInterval(() => {
       setTime((t) => {
@@ -89,7 +113,6 @@ export default function MathGame() {
           setMsg("⏰ Die Zeit ist abgelaufen!");
           setTotal((tot) => tot + 1);
 
-          // si AutoLevel ON, le temps écoulé compte comme erreur
           if (autoLevel) {
             setStreak(0);
             setMistakes((m) => {
@@ -106,7 +129,6 @@ export default function MathGame() {
           setInput("");
           return 10;
         }
-
         return t - 1;
       });
     }, 1000);

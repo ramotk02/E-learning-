@@ -6,7 +6,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// connexion l db
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -14,20 +13,24 @@ const db = mysql.createConnection({
   database: "e-leraning",
 });
 
-// post
-app.post("/save", (req, res) => {
-  const { user, score } = req.body;
 
-  const sql = "INSERT INTO math_stats (user_name, score) VALUES (?, ?)";
-  db.query(sql, [user, score], (err) => {
+app.post("/save", (req, res) => {
+  console.log("REQ BODY:", req.body);
+
+  const { user, score, total, level } = req.body;
+
+  const sql =
+    "INSERT INTO math_stats (user_name, score, total, level) VALUES (?, ?, ?, ?)";
+
+  db.query(sql, [user, score, total, level], (err) => {
     if (err) {
-      res.status(500).send("Erreur");
-    } else {
-      res.send("OK");
+      console.log("SQL ERROR:", err);
+      return res.status(500).send("Error");
     }
+    res.send("OK");
   });
 });
 
 app.listen(3001, () => {
-  console.log("Server started on port 3001");
+  console.log("Server khdam f 3001");
 });
