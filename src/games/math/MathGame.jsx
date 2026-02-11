@@ -22,6 +22,10 @@ export default function MathGame() {
   const [streak, setStreak] = useState(0);
   const [mistakes, setMistakes] = useState(0);
 
+  //Nmr of questions:
+  const [maxQuestions, setMaxQuestions]= useState(10);
+  const [finished, setFinished] = useState("False");
+
   function levelUp() {
     setLevel((lv) =>
       lv === "easy" ? "medium" : lv === "medium" ? "hard" : "hard"
@@ -97,7 +101,6 @@ export default function MathGame() {
     }
 
     // send to DB
-    saveScoreToDb(newScore, newTotal, level);
 
     setTimeout(() => {
       setMsg("");
@@ -194,11 +197,22 @@ export default function MathGame() {
         <b>{q.question}</b>
       </p>
 
-      <input value={input} onChange={(e) => setInput(e.target.value)} />
+      <input value={input} onChange={(e) => setInput(e.target.value)} 
+              onKeyDown={(e)=>{
+                if (e.key==="Enter"){
+                  checkAnswer();
+                };
+              }} />
       <button onClick={checkAnswer} style={{ marginLeft: 10 }}>
         Check
       </button>
 
+      <button
+        onClick={() => saveScoreToDb(score, total, level)}
+        style={{ marginLeft: 10 }}
+      >
+        Finish
+      </button>
       {msg && <p>{msg}</p>}
     </div>
   );
