@@ -2,29 +2,30 @@ import { useState, useEffect } from "react";
 import { generateQuestion } from "./mathGenerator";
 
 export default function MathGame() {
-  // level
+  const [started, setStarted] = useState(false);
+
+  // setup
   const [level, setLevel] = useState("easy");
   const [autoLevel, setAutoLevel] = useState(true);
+  const [maxQuestions, setMaxQuestions] = useState(10);
 
-  // question / input / message
+  // game state
   const [q, setQ] = useState(() => generateQuestion(level));
   const [input, setInput] = useState("");
   const [msg, setMsg] = useState("");
 
-  // score
   const [score, setScore] = useState(0);
   const [total, setTotal] = useState(0);
 
-  // timer
   const [time, setTime] = useState(10);
 
-  // auto level counters
   const [streak, setStreak] = useState(0);
   const [mistakes, setMistakes] = useState(0);
 
-  //Nmr of questions:
-  const [maxQuestions, setMaxQuestions]= useState(10);
-  const [finished, setFinished] = useState("False");
+  const [finished, setFinished] = useState(false);
+
+  // after finish saving
+  const [saved, setSaved] = useState(false);
 
   function levelUp() {
     setLevel((lv) =>
@@ -36,6 +37,22 @@ export default function MathGame() {
     setLevel((lv) =>
       lv === "hard" ? "medium" : lv === "medium" ? "easy" : "easy"
     );
+  }
+
+  function startGame() {
+    setScore(0);
+    setTotal(0);
+    setTime(10);
+    setMsg("");
+    setInput("");
+    setFinished(false);
+    setSaved(false);
+
+    setStreak(0);
+    setMistakes(0);
+
+    setQ(generateQuestion(level));
+    setStarted(true);
   }
 
   function nextQuestion(customLevel) {
@@ -57,15 +74,25 @@ export default function MathGame() {
       }),
     })
       .then((r) => r.text())
-      .then((txt) => console.log("API RESPONSE:", txt))
+      .then((txt) => {
+        console.log("API RESPONSE:", txt);
+        if (txt === "OK") setSaved(true);
+      })
       .catch((e) => console.log("FETCH ERROR:", e));
   }
 
   function checkAnswer() {
-    const correct = Number(input) === q.answer;
+    if (finished) return;
+    if (total >= maxQuestions) {
+      setFinished(true);
+      return;
+    }
 
+    const correct = Number(input) === q.answer;
     const newTotal = total + 1;
-    const newScore = correct ? score + 1 : score;
+
+    // fini si on atteint la limite
+    if (newTotal >= maxQuestions) setFinished(true);
 
     setTotal((t) => t + 1);
 
@@ -100,19 +127,31 @@ export default function MathGame() {
       }
     }
 
-    // send to DB
-
     setTimeout(() => {
       setMsg("");
-      nextQuestion();
-    }, 800);
+      // seulement si pas terminé
+      if (newTotal < maxQuestions) nextQuestion();
+    }, 800); 
   }
 
   // Timer
   useEffect(() => {
+    if (!started) return;
+
     const interval = setInterval(() => {
       setTime((t) => {
+        if (finished) return t;
+
+        // sécurité
+        if (total >= maxQuestions) {
+          setFinished(true);
+          return t;
+        }
+
         if (t === 1) {
+          // temps fini = une question perdue
+          const newTotal = total + 1;
+
           setMsg("⏰ Die Zeit ist abgelaufen!");
           setTotal((tot) => tot + 1);
 
@@ -128,23 +167,90 @@ export default function MathGame() {
             });
           }
 
+          // fini ou nouvelle question
+          if (newTotal >= maxQuestions) {
+            setFinished(true);
+            return 10;
+          }
+
           setQ(generateQuestion(level));
           setInput("");
           return 10;
         }
+
         return t - 1;
       });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [level, autoLevel]);
+  }, [started, finished, level, autoLevel, total, maxQuestions]);
 
+  // SETUP SCREEN
+  if (!started) {
+    return (
+      <div style={{ padding: 20 }}>
+        <h2>Math Setup</h2>
+
+        <p>
+          <b>Questions:</b>{" "}
+          <select
+            value={maxQuestions}
+            onChange={(e) => setMaxQuestions(Number(e.target.value))}
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+          </select>
+        </p>
+
+        <p>
+          <b>Start Level:</b>{" "}
+          <select value={level} onChange={(e) => setLevel(e.target.value)}>
+            <option value="easy">easy</option>
+            <option value="medium">medium</option>
+            <option value="hard">hard</option>
+          </select>
+        </p>
+
+        <p>
+          <b>Auto Level:</b>{" "}
+          <button onClick={() => setAutoLevel(!autoLevel)}>
+            {autoLevel ? "ON" : "OFF"}
+          </button>
+        </p>
+
+        <button onClick={startGame}>Start</button>
+      </div>
+    );
+  }
+
+  // SAVED SCREEN (after clicking Finish)
+  if (saved) {
+    return (
+      <div style={{ padding: 20 }}>
+        <h2>✅ Saved!</h2>
+        <p>Deine Sitzung wurde gespeichert.</p>
+
+        <button onClick={startGame}>Replay</button>
+
+        <button onClick={() => setStarted(false)} style={{ marginLeft: 10 }}>
+          Exit
+        </button>
+      </div>
+    );
+  }
+
+  // GAME SCREEN
   return (
     <div style={{ padding: 20 }}>
       <h2>Math Game</h2>
 
       <p>
         <b>Score:</b> {score} / {total}
+      </p>
+
+      <p>
+        <b>Progress:</b> {total} / {maxQuestions}
       </p>
 
       <p>
@@ -197,22 +303,37 @@ export default function MathGame() {
         <b>{q.question}</b>
       </p>
 
-      <input value={input} onChange={(e) => setInput(e.target.value)} 
-              onKeyDown={(e)=>{
-                if (e.key==="Enter"){
-                  checkAnswer();
-                };
-              }} />
-      <button onClick={checkAnswer} style={{ marginLeft: 10 }}>
+      <input
+        disabled={finished}
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && !finished) checkAnswer();
+        }}
+      />
+
+      <button
+        disabled={finished}
+        onClick={checkAnswer}
+        style={{ marginLeft: 10 }}
+      >
         Check
       </button>
 
       <button
-        onClick={() => saveScoreToDb(score, total, level)}
+        disabled={!finished}
+        onClick={() => saveScoreToDb(score, total, level)} 
         style={{ marginLeft: 10 }}
       >
-        Finish
+        Finish (Save)
       </button>
+
+      {finished && (
+        <p>
+          <b>Sitzung beendet! Klicke auf “Finish (Save)” um zu speichern.</b>
+        </p>
+      )}
+
       {msg && <p>{msg}</p>}
     </div>
   );
