@@ -64,28 +64,37 @@ app.get("/stats/summary", (req, res) => {
 });
 
 app.get("/stats/daily", (req, res) => {
-  const { playerId, game = "math", days = 30 } = req.query;
+  const { playerId, game, days = 30 } = req.query;
 
-  if (!playerId) return res.status(400).json({ error: "playerId missing" });
+  if (!playerId) {
+    return res.status(400).json({ error: "playerId missing" });
+  }
 
-  const sql = `
+  let sql = `
     SELECT
       DATE(created_at) AS day,
       COUNT(*) AS sessions,
-      AVG(score) AS avgScore,
-      AVG(score / NULLIF(total,0)) AS avgAccuracy
+      AVG(score) AS avgScore
     FROM sessions
-    WHERE player_id = ? AND game = ?
+    WHERE player_id = ?
       AND created_at >= NOW() - INTERVAL ? DAY
-    GROUP BY day
-    ORDER BY day
   `;
 
-  db.query(sql, [playerId, game, Number(days)], (err, rows) => {
+  const params = [playerId, Number(days)];
+
+  if (game && game !== "all") {
+    sql += " AND game = ?";
+    params.push(game);
+  }
+
+  sql += " GROUP BY day ORDER BY day";
+
+  db.query(sql, params, (err, rows) => {
     if (err) return res.status(500).send("Error");
     res.json(rows);
   });
 });
+
 
 app.get("/stats/by-level", (req, res) => {
   const { playerId, game = "math" } = req.query;
