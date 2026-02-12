@@ -1,6 +1,16 @@
 import { useState, useEffect } from "react";
 import { generateQuestion } from "./mathGenerator";
 
+//  player_id stable (pas besoin de login)
+function getPlayerId() {
+  let id = localStorage.getItem("player_id");
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem("player_id", id);
+  }
+  return id;
+}
+
 export default function MathGame() {
   const [started, setStarted] = useState(false);
 
@@ -26,6 +36,9 @@ export default function MathGame() {
 
   // after finish saving
   const [saved, setSaved] = useState(false);
+
+  // ✅ pour calculer durationSec
+  const [startAt, setStartAt] = useState(null);
 
   function levelUp() {
     setLevel((lv) =>
@@ -53,6 +66,9 @@ export default function MathGame() {
 
     setQ(generateQuestion(level));
     setStarted(true);
+
+    // ✅ start time
+    setStartAt(Date.now());
   }
 
   function nextQuestion(customLevel) {
@@ -63,14 +79,19 @@ export default function MathGame() {
   }
 
   function saveScoreToDb(scoreToSend, totalToSend, levelToSend) {
+    const playerId = getPlayerId();
+    const durationSec = startAt ? Math.floor((Date.now() - startAt) / 1000) : 0;
+
     fetch("http://localhost:3001/save", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        user: "test",
+        playerId,
+        game: "math",
         score: scoreToSend,
         total: totalToSend,
         level: levelToSend,
+        durationSec,
       }),
     })
       .then((r) => r.text())
@@ -83,6 +104,8 @@ export default function MathGame() {
 
   function checkAnswer() {
     if (finished) return;
+
+    // stop si déjà limite
     if (total >= maxQuestions) {
       setFinished(true);
       return;
@@ -129,9 +152,8 @@ export default function MathGame() {
 
     setTimeout(() => {
       setMsg("");
-      // seulement si pas terminé
       if (newTotal < maxQuestions) nextQuestion();
-    }, 800); 
+    }, 800);
   }
 
   // Timer
@@ -224,7 +246,7 @@ export default function MathGame() {
     );
   }
 
-  // SAVED SCREEN (after clicking Finish)
+  // SAVED SCREEN
   if (saved) {
     return (
       <div style={{ padding: 20 }}>
@@ -322,7 +344,7 @@ export default function MathGame() {
 
       <button
         disabled={!finished}
-        onClick={() => saveScoreToDb(score, total, level)} 
+        onClick={() => saveScoreToDb(score, total, level)}
         style={{ marginLeft: 10 }}
       >
         Finish (Save)
