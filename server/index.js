@@ -10,41 +10,43 @@ const db = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "root",
-  database: "e-leraning",
+  database: "e-leraning", // genau so wie deine DB heißt
 });
 
+// optional: DB errors loggen (verhindert "silent" crashes)
+db.on("error", (err) => {
+  console.log("DB ERROR:", err);
+});
 
-
+// ✅ SAVE (Session speichern)
 app.post("/save", (req, res) => {
   console.log("BODY:", req.body);
 
   const { playerId, game, score, total, level, durationSec } = req.body;
+
+  if (!playerId || !game || score === undefined || total === undefined || !level) {
+    return res.status(400).json({ error: "missing fields" });
+  }
 
   const sql = `
     INSERT INTO sessions (player_id, game, score, total, level, duration_sec)
     VALUES (?, ?, ?, ?, ?, ?)
   `;
 
-  db.query(
-    sql,
-    [playerId, game, score, total, level, durationSec || 0],
-    (err) => {
-      if (err) {
-        console.log("SQL ERROR:", err);
-        return res.status(500).send("Error");
-      }
-      res.send("OK");
+  db.query(sql, [playerId, game, score, total, level, durationSec || 0], (err) => {
+    if (err) {
+      console.log("SQL ERROR:", err);
+      return res.status(500).send("Error");
     }
-  );
+    res.send("OK");
+  });
 });
 
-
+// ✅ SUMMARY für ein Spiel (default math)
 app.get("/stats/summary", (req, res) => {
   const { playerId, game = "math" } = req.query;
 
-   if (!playerId) {
-    return res.status(400).json({ error: "playerId missing" });
-  }
+  if (!playerId) return res.status(400).json({ error: "playerId missing" });
 
   const sql = `
     SELECT
@@ -63,12 +65,11 @@ app.get("/stats/summary", (req, res) => {
   });
 });
 
+// ✅ DAILY (für "all" oder ein game)
 app.get("/stats/daily", (req, res) => {
-  const { playerId, game, days = 30 } = req.query;
+  const { playerId, game = "all", days = 30 } = req.query;
 
-  if (!playerId) {
-    return res.status(400).json({ error: "playerId missing" });
-  }
+  if (!playerId) return res.status(400).json({ error: "playerId missing" });
 
   let sql = `
     SELECT
@@ -82,7 +83,7 @@ app.get("/stats/daily", (req, res) => {
 
   const params = [playerId, Number(days)];
 
-  if (game && game !== "all") {
+  if (game !== "all") {
     sql += " AND game = ?";
     params.push(game);
   }
@@ -95,31 +96,31 @@ app.get("/stats/daily", (req, res) => {
   });
 });
 
-
-app.get("/stats/by-level", (req, res) => {
-  const { playerId, game = "math" } = req.query;
+// ✅ BY-GAME (neu): Stats pro Spiel
+app.get("/stats/by-game", (req, res) => {
+  const { playerId } = req.query;
 
   if (!playerId) return res.status(400).json({ error: "playerId missing" });
 
   const sql = `
     SELECT
-      level,
+      game,
       COUNT(*) AS sessions,
       AVG(score) AS avgScore,
+      MAX(score) AS bestScore,
       AVG(score / NULLIF(total,0)) AS avgAccuracy
     FROM sessions
-    WHERE player_id = ? AND game = ?
-    GROUP BY level
-    ORDER BY FIELD(level,'easy','medium','hard')
+    WHERE player_id = ?
+    GROUP BY game
+    ORDER BY game
   `;
 
-  db.query(sql, [playerId, game], (err, rows) => {
+  db.query(sql, [playerId], (err, rows) => {
     if (err) return res.status(500).send("Error");
     res.json(rows);
   });
 });
 
-
 app.listen(3001, () => {
-  console.log("Server khdam f 3001");
+  console.log("Server läuft auf Port 3001");
 });
