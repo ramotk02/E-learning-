@@ -1,18 +1,15 @@
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Landing from "./pages/LandingPage/Landing";
+import Dashboard from "./pages/Dashboard";
 import MathGame from "./games/math/MathGame";
-import Dashboard from "./pages/dashboard";
 
 export default function App() {
   return (
     <BrowserRouter>
-      <nav style={{ padding: 12, display: "flex", gap: 12, borderBottom: "1px solid #ddd" }}>
-        <Link to="/">Math</Link>
-        <Link to="/dashboard">Dashboard</Link>
-      </nav>
-
       <Routes>
-        <Route path="/" element={<MathGame />} />
+        <Route path="/" element={<Landing />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/math" element={<MathGame />} />
       </Routes>
     </BrowserRouter>
   );

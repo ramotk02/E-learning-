@@ -120,6 +120,32 @@ app.get("/stats/by-game", (req, res) => {
     res.json(rows);
   });
 });
+app.get("/stats/overall", (req, res) => {
+  const { playerId } = req.query;
+
+  if (!playerId) {
+    return res.status(400).json({ error: "playerId missing" });
+  }
+
+  const sql = `
+    SELECT
+      COUNT(*) AS sessions,
+      AVG(score) AS avgScore,
+      MAX(score) AS bestScore,
+      AVG(duration_sec) AS avgDuration,
+      AVG(score / NULLIF(total,0)) AS avgAccuracy
+    FROM sessions
+    WHERE player_id = ?
+  `;
+
+  db.query(sql, [playerId], (err, rows) => {
+    if (err) {
+      console.log("SQL ERROR:", err);
+      return res.status(500).send("Error");
+    }
+    res.json(rows[0]);
+  });
+});
 
 app.listen(3001, () => {
   console.log("Server läuft auf Port 3001");

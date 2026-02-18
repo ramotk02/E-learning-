@@ -1,0 +1,192 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --sz: 24px;
+  --c1: #4b2889;
+  --c2: #673ab7;
+  --c3: #401c81;
+  --c4: #2d125d;
+
+  --ts: 50% / calc(var(--sz) * 10) calc(var(--sz) * 10);
+  --pz: calc(var(--sz) * 0.65), #fff0 calc((var(--sz) * 0.65) + 1px);
+}
+
+body {
+  min-height: 100vh;
+  font-family: Inter, system-ui, Arial, sans-serif;
+
+  /* ✅ TON BACKGROUND (pareil) */
+  background:
+    radial-gradient(circle at 53% 25%, var(--c4) var(--pz)) var(--ts),
+    radial-gradient(circle at 75% 47%, var(--c2) var(--pz)) var(--ts),
+    radial-gradient(circle at 3% 75%, var(--c2) var(--pz)) var(--ts),
+    radial-gradient(circle at 25% 53%, var(--c4) var(--pz)) var(--ts),
+    radial-gradient(circle at 53% 75%, var(--c3) var(--pz)) var(--ts),
+    radial-gradient(circle at 75% 97%, var(--c1) var(--pz)) var(--ts),
+    radial-gradient(circle at 3% 25%, var(--c1) var(--pz)) var(--ts),
+    radial-gradient(circle at 25% 3%, var(--c3) var(--pz)) var(--ts),
+    conic-gradient(
+      from 0deg at 50% 50%,
+      var(--c1) 0 25%,
+      var(--c2) 0 50%,
+      var(--c3) 0 75%,
+      var(--c4) 0 100%
+    ) var(--ts);
+}
+
+/* ✅ Grillage / grid overlay comme ton screenshot */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+
+  background-image:
+    linear-gradient(rgba(0,0,0,0.28) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(0,0,0,0.28) 2px, transparent 2px);
+  background-size: calc(var(--sz) * 10) calc(var(--sz) * 10);
+  opacity: 0.6;
+}
+
+/* PAGE */
+.landing {
+  min-height: 100vh;
+  padding: 80px 100px 60px;
+  color: #fff;
+  position: relative;
+  z-index: 1;
+}
+
+/* HERO */
+.hero {
+  display: grid;
+  grid-template-columns: 620px 1fr;
+  gap: 80px;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.hero-img {
+  width: 100%;
+  height: 420px;
+  object-fit: cover;
+  border-radius: 14px;
+  box-shadow: 0 22px 60px rgba(0,0,0,0.55);
+}
+
+.hero-box {
+  background: rgba(120, 11, 150, 0.92);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 14px;
+  padding: 28px 30px;
+  box-shadow: 0 22px 60px rgba(0,0,0,0.55);
+  max-width: 520px;
+}
+
+.hero-title {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  margin-bottom: 14px;
+}
+
+.hero-text {
+  font-size: 14px;
+  line-height: 1.7;
+  opacity: 0.95;
+}
+
+/* CARDS */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  gap: 70px;
+  margin-top: 110px;
+}
+
+.card {
+  background: rgba(120, 11, 150, 0.92);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 16px;
+  padding: 26px 26px;
+  box-shadow: 0 22px 60px rgba(0,0,0,0.55);
+  transition: transform 180ms ease, filter 180ms ease;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  filter: brightness(1.05);
+}
+
+.card-left {
+  border-bottom-left-radius: 160px;
+}
+
+.card-right {
+  border-bottom-right-radius: 160px;
+}
+
+.card-icon {
+  font-size: 34px;
+  margin-bottom: 12px;
+  opacity: 0.95;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.card-text {
+  font-size: 12.5px;
+  line-height: 1.7;
+  opacity: 0.95;
+}
+
+/* CTA */
+.cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 90px;
+  padding-bottom: 10px;
+}
+
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 60px;
+  width: 220px;
+
+  border-radius: 16px;
+  background: rgba(75, 40, 137, 0.95);
+  border: 1px solid rgba(255,255,255,0.18);
+
+  color: #fff;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 18px;
+
+  box-shadow: 0 18px 40px rgba(0,0,0,0.5);
+  transition: transform 180ms ease, background 180ms ease, color 180ms ease;
+}
+
+.cta-btn:hover {
+  transform: translateY(-2px);
+  background: #fff;
+  color: #111;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1200px) {
+  .landing { padding: 60px 40px; }
+  .hero { grid-template-columns: 1fr; gap: 30px; }
+  .hero-box { max-width: 100%; }
+  .cards { grid-template-columns: 1fr; gap: 30px; }
+  .card-left, .card-right { border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; }
+}
