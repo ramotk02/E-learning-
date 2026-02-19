@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { generateQuestion } from "./mathGenerator";
+import "./MathGame.css";
 
-//  player_id stable (pas besoin de login)
+// Guest 
 function getPlayerId() {
   let id = localStorage.getItem("player_id");
   if (!id) {
@@ -14,12 +15,11 @@ function getPlayerId() {
 export default function MathGame() {
   const [started, setStarted] = useState(false);
 
-  // setup
+  
   const [level, setLevel] = useState("easy");
   const [autoLevel, setAutoLevel] = useState(true);
   const [maxQuestions, setMaxQuestions] = useState(10);
 
-  // game state
   const [q, setQ] = useState(() => generateQuestion(level));
   const [input, setInput] = useState("");
   const [msg, setMsg] = useState("");
@@ -34,12 +34,12 @@ export default function MathGame() {
 
   const [finished, setFinished] = useState(false);
 
-  // after finish saving
   const [saved, setSaved] = useState(false);
 
-  // ✅ pour calculer durationSec
   const [startAt, setStartAt] = useState(null);
 
+
+//niveau auto
   function levelUp() {
     setLevel((lv) =>
       lv === "easy" ? "medium" : lv === "medium" ? "hard" : "hard"
@@ -66,11 +66,9 @@ export default function MathGame() {
 
     setQ(generateQuestion(level));
     setStarted(true);
-
-    // ✅ start time
     setStartAt(Date.now());
   }
-
+//kit 3iyet l qst li moraha
   function nextQuestion(customLevel) {
     const lv = customLevel || level;
     setQ(generateQuestion(lv));
@@ -78,6 +76,7 @@ export default function MathGame() {
     setTime(10);
   }
 
+  //kit sift score l databsase
   function saveScoreToDb(scoreToSend, totalToSend, levelToSend) {
     const playerId = getPlayerId();
     const durationSec = startAt ? Math.floor((Date.now() - startAt) / 1000) : 0;
@@ -105,7 +104,6 @@ export default function MathGame() {
   function checkAnswer() {
     if (finished) return;
 
-    // stop si déjà limite
     if (total >= maxQuestions) {
       setFinished(true);
       return;
@@ -114,9 +112,7 @@ export default function MathGame() {
     const correct = Number(input) === q.answer;
     const newTotal = total + 1;
 
-    // fini si on atteint la limite
     if (newTotal >= maxQuestions) setFinished(true);
-
     setTotal((t) => t + 1);
 
     if (correct) {
@@ -156,7 +152,7 @@ export default function MathGame() {
     }, 800);
   }
 
-  // Timer
+  // we9t
   useEffect(() => {
     if (!started) return;
 
@@ -164,17 +160,15 @@ export default function MathGame() {
       setTime((t) => {
         if (finished) return t;
 
-        // sécurité
         if (total >= maxQuestions) {
           setFinished(true);
           return t;
         }
 
         if (t === 1) {
-          // temps fini = une question perdue
           const newTotal = total + 1;
 
-          setMsg("⏰ Die Zeit ist abgelaufen!");
+          setMsg("Die Zeit ist abgelaufen!");
           setTotal((tot) => tot + 1);
 
           if (autoLevel) {
@@ -189,7 +183,6 @@ export default function MathGame() {
             });
           }
 
-          // fini ou nouvelle question
           if (newTotal >= maxQuestions) {
             setFinished(true);
             return 10;
@@ -210,38 +203,52 @@ export default function MathGame() {
   // SETUP SCREEN
   if (!started) {
     return (
-      <div style={{ padding: 20 }}>
-        <h2>Math Setup</h2>
+      <div className="mg-page">
+        <div className="mg-panel">
+          <div className="mg-titleRow">
+            <h2 className="mg-title">Math Setup</h2>
+            <span className="mg-badge">Edu-Exos</span>
+          </div>
 
-        <p>
-          <b>Questions:</b>{" "}
-          <select
-            value={maxQuestions}
-            onChange={(e) => setMaxQuestions(Number(e.target.value))}
-          >
-            <option value={5}>5</option>
-            <option value={10}>10</option>
-            <option value={20}>20</option>
-          </select>
-        </p>
+          <div className="mg-grid">
+            <div className="mg-field">
+              <label>Questions</label>
+              <select
+                value={maxQuestions}
+                onChange={(e) => setMaxQuestions(Number(e.target.value))}
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+              </select>
+            </div>
 
-        <p>
-          <b>Start Level:</b>{" "}
-          <select value={level} onChange={(e) => setLevel(e.target.value)}>
-            <option value="easy">easy</option>
-            <option value="medium">medium</option>
-            <option value="hard">hard</option>
-          </select>
-        </p>
+            <div className="mg-field">
+              <label>Start Level</label>
+              <select value={level} onChange={(e) => setLevel(e.target.value)}>
+                <option value="easy">easy</option>
+                <option value="medium">medium</option>
+                <option value="hard">hard</option>
+              </select>
+            </div>
 
-        <p>
-          <b>Auto Level:</b>{" "}
-          <button onClick={() => setAutoLevel(!autoLevel)}>
-            {autoLevel ? "ON" : "OFF"}
-          </button>
-        </p>
+            <div className="mg-field">
+              <label>Auto Level</label>
+              <button
+                className={`mg-toggle ${autoLevel ? "on" : "off"}`}
+                onClick={() => setAutoLevel(!autoLevel)}
+              >
+                {autoLevel ? "ON" : "OFF"}
+              </button>
+            </div>
+          </div>
 
-        <button onClick={startGame}>Start</button>
+          <div className="mg-actions">
+            <button className="mg-btn primary" onClick={startGame}>
+              Start
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -249,114 +256,144 @@ export default function MathGame() {
   // SAVED SCREEN
   if (saved) {
     return (
-      <div style={{ padding: 20 }}>
-        <h2>✅ Saved!</h2>
-        <p>Deine Sitzung wurde gespeichert.</p>
+      <div className="mg-page">
+        <div className="mg-panel">
+          <h2 className="mg-title"> Saved!</h2>
+          <p className="mg-sub">Deine Sitzung wurde gespeichert.</p>
 
-        <button onClick={startGame}>Replay</button>
-
-        <button onClick={() => setStarted(false)} style={{ marginLeft: 10 }}>
-          Exit
-        </button>
+          <div className="mg-actions">
+            <button className="mg-btn primary" onClick={startGame}>
+              Replay
+            </button>
+            <button className="mg-btn" onClick={() => setStarted(false)}>
+              Exit
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
 
   // GAME SCREEN
   return (
-    <div style={{ padding: 20 }}>
-      <h2>Math Game</h2>
+    <div className="mg-page">
+      <div className="mg-panel">
+        <div className="mg-titleRow">
+          <h2 className="mg-title">Math Game</h2>
+          <span className="mg-chip">
+            Level: <b>{level}</b> • Time: <b>{time}s</b>
+          </span>
+        </div>
 
-      <p>
-        <b>Score:</b> {score} / {total}
-      </p>
+        <div className="mg-stats">
+          <div className="mg-stat">
+            <span>Score</span>
+            <b>
+              {score} / {total}
+            </b>
+          </div>
+          <div className="mg-stat">
+            <span>Progress</span>
+            <b>
+              {total} / {maxQuestions}
+            </b>
+          </div>
+          <div className="mg-stat">
+            <span>Streak</span>
+            <b>{streak}</b>
+          </div>
+          <div className="mg-stat">
+            <span>Errors</span>
+            <b>{mistakes}</b>
+          </div>
+        </div>
 
-      <p>
-        <b>Progress:</b> {total} / {maxQuestions}
-      </p>
+        <div className="mg-row">
+          <span className="mg-muted">Auto Level</span>
+          <button
+            className={`mg-toggle ${autoLevel ? "on" : "off"}`}
+            onClick={() => setAutoLevel(!autoLevel)}
+          >
+            {autoLevel ? "ON" : "OFF"}
+          </button>
+        </div>
 
-      <p>
-        <b>Level:</b> {level} | <b>Time:</b> {time}s
-      </p>
+        <div className="mg-row">
+          <span className="mg-muted">Manual Level</span>
+          <div className="mg-levelBtns">
+            <button
+              className="mg-btn"
+              disabled={autoLevel}
+              onClick={() => {
+                setLevel("easy");
+                nextQuestion("easy");
+              }}
+            >
+              Easy
+            </button>
+            <button
+              className="mg-btn"
+              disabled={autoLevel}
+              onClick={() => {
+                setLevel("medium");
+                nextQuestion("medium");
+              }}
+            >
+              Medium
+            </button>
+            <button
+              className="mg-btn"
+              disabled={autoLevel}
+              onClick={() => {
+                setLevel("hard");
+                nextQuestion("hard");
+              }}
+            >
+              Hard
+            </button>
+          </div>
+        </div>
 
-      <p>
-        <b>Auto Level:</b>{" "}
-        <button onClick={() => setAutoLevel(!autoLevel)}>
-          {autoLevel ? "ON" : "OFF"}
-        </button>
-      </p>
+        <div className="mg-question">
+          <div className="mg-qLabel">Question</div>
+          <div className="mg-qText">{q.question}</div>
+        </div>
 
-      <p>
-        <b>Manual Level:</b>{" "}
-        <button
-          disabled={autoLevel}
-          onClick={() => {
-            setLevel("easy");
-            nextQuestion("easy");
-          }}
-        >
-          Easy
-        </button>{" "}
-        <button
-          disabled={autoLevel}
-          onClick={() => {
-            setLevel("medium");
-            nextQuestion("medium");
-          }}
-        >
-          Medium
-        </button>{" "}
-        <button
-          disabled={autoLevel}
-          onClick={() => {
-            setLevel("hard");
-            nextQuestion("hard");
-          }}
-        >
-          Hard
-        </button>
-      </p>
+        <div className="mg-answer">
+          <input
+            className="mg-input"
+            disabled={finished}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !finished) checkAnswer();
+            }}
+            placeholder="Antwort eingeben…"
+          />
+          <button
+            className="mg-btn primary"
+            disabled={finished}
+            onClick={checkAnswer}
+          >
+            Check
+          </button>
+          <button
+            className="mg-btn"
+            disabled={!finished}
+            onClick={() => saveScoreToDb(score, total, level)}
+          >
+            Finish (Save)
+          </button>
+        </div>
 
-      <p>
-        <b>Streak:</b> {streak} | <b>Errors:</b> {mistakes}
-      </p>
+        {finished && (
+          <p className="mg-hint">
+            Sitzung beendet! Klicke auf <b>“Finish (Save)”</b> um zu speichern.
+          </p>
+        )}
 
-      <p style={{ fontSize: 18 }}>
-        <b>{q.question}</b>
-      </p>
-
-      <input
-        disabled={finished}
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && !finished) checkAnswer();
-        }}
-      />
-
-      <button
-        disabled={finished}
-        onClick={checkAnswer}
-        style={{ marginLeft: 10 }}
-      >
-        Check
-      </button>
-
-      <button
-        disabled={!finished}
-        onClick={() => saveScoreToDb(score, total, level)}
-        style={{ marginLeft: 10 }}
-      >
-        Finish (Save)
-      </button>
-
-      {finished && (
-        <p>
-          <b>Sitzung beendet! Klicke auf “Finish (Save)” um zu speichern.</b>
-        </p>
-      )}
-
-      {msg && <p>{msg}</p>}
+        {msg && <div className="mg-msg">{msg}</div>}
+      </div>
     </div>
   );
 }

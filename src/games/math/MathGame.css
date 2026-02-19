@@ -1,0 +1,227 @@
+:root{
+  --sz: 24px;
+  --c1: #4b2889;
+  --c2: #673ab7;
+  --c3: #401c81;
+  --c4: #2d125d;
+  --ts: 50% / calc(var(--sz) * 10) calc(var(--sz) * 10);
+  --pz: calc(var(--sz) * 0.65), #fff0 calc((var(--sz) * 0.65) + 1px);
+
+  --panel: #780b96;
+  --panel-dark: #5e0a7a;
+  --border: rgba(255,255,255,0.15);
+  --text: #ffffff;
+  --shadow: 0 18px 45px rgba(0,0,0,0.45);
+}
+
+/* ===== BACKGROUND ===== */
+
+.db-page{
+  min-height: 100vh;
+  padding: 32px;
+  color: var(--text);
+  font-family: Inter, system-ui, Arial, sans-serif;
+
+  background:
+    radial-gradient(circle at 53% 25%, var(--c4) var(--pz)) var(--ts),
+    radial-gradient(circle at 75% 47%, var(--c2) var(--pz)) var(--ts),
+    radial-gradient(circle at 3% 75%, var(--c2) var(--pz)) var(--ts),
+    radial-gradient(circle at 25% 53%, var(--c4) var(--pz)) var(--ts),
+    radial-gradient(circle at 53% 75%, var(--c3) var(--pz)) var(--ts),
+    radial-gradient(circle at 75% 97%, var(--c1) var(--pz)) var(--ts),
+    radial-gradient(circle at 3% 25%, var(--c1) var(--pz)) var(--ts),
+    radial-gradient(circle at 25% 3%, var(--c3) var(--pz)) var(--ts),
+    conic-gradient(from 0deg at 50% 50%,
+      var(--c1) 0 25%,
+      var(--c2) 0 50%,
+      var(--c3) 0 75%,
+      var(--c4) 0 100%
+    ) var(--ts);
+}
+
+/* ===== HEADER ===== */
+
+.db-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap: 14px;
+  margin-bottom: 20px;
+
+  background: linear-gradient(180deg, var(--panel), var(--panel-dark));
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+
+.db-kicker{
+  font-size: 13px;
+  font-weight: 800;
+  opacity: 0.9;
+}
+
+.db-name{
+  margin: 6px 0 0;
+  font-size: 34px;
+  font-weight: 900;
+}
+
+.db-sub{
+  margin-top: 6px;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.db-idBox{
+  text-align:right;
+}
+
+.db-idLabel{
+  font-size: 12px;
+  font-weight: 800;
+  opacity: 0.9;
+}
+
+.db-idValue{
+  margin-top: 6px;
+  font-size: 12px;
+  word-break: break-all;
+  background: #4b2889;
+  padding: 8px 10px;
+  border-radius: 12px;
+}
+
+/* ===== SECTION ===== */
+
+.db-section{
+  margin-top: 20px;
+  background: linear-gradient(180deg, var(--panel), var(--panel-dark));
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+
+.db-sectionTitle{
+  font-size: 16px;
+  font-weight: 900;
+  margin-bottom: 14px;
+}
+
+/* ===== OVERALL CARDS ===== */
+
+.db-cards{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+}
+
+.db-card{
+  background: #4b2889;
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.db-card-title{
+  font-size: 12px;
+  font-weight: 800;
+  opacity: 0.9;
+}
+
+.db-card-value{
+  margin-top: 8px;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+/* ===== GAME STATS ===== */
+
+.db-gameRow{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 14px;
+}
+
+.db-gameBox{
+  background: #4b2889;
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.db-gameHead{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.db-gameTitle{
+  font-weight: 900;
+  font-size: 16px;
+}
+
+.db-gamePill{
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #2d125d;
+  font-weight: 900;
+}
+
+.db-gameGrid{
+  margin-top: 14px;
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.db-mini{
+  background: #2d125d;
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.db-mini span{
+  font-size: 12px;
+}
+
+.db-mini b{
+  display:block;
+  margin-top: 4px;
+}
+
+/* ===== START TILES ===== */
+
+.db-tiles{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 14px;
+}
+
+.db-tile{
+  text-decoration:none;
+  color: white;
+  background: #4b2889;
+  border-radius: 18px;
+  padding: 18px;
+  transition: transform 0.18s ease;
+}
+
+.db-tile:hover{
+  transform: translateY(-4px);
+}
+
+.db-tileTop{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.db-tileTitle{
+  font-weight: 900;
+  font-size: 16px;
+}
+
+.db-tileDesc{
+  margin-top: 10px;
+  font-size: 13px;
+  opacity: 0.95;
+}
