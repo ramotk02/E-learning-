@@ -147,6 +147,37 @@ app.get("/stats/overall", (req, res) => {
   });
 });
 
+app.get("/stats/daily", (req, res) => {
+  const { playerId, game = "all", days = 30 } = req.query;
+
+  if (!playerId) return res.status(400).json({ error: "playerId missing" });
+
+  let sql = `
+    SELECT
+      DATE(created_at) AS day,
+      COUNT(*) AS sessions,
+      AVG(score / NULLIF(total,0)) AS avgAccuracy,
+      AVG(score) AS avgScore
+    FROM sessions
+    WHERE player_id = ?
+      AND created_at >= NOW() - INTERVAL ? DAY
+  `;
+
+  const params = [playerId, Number(days)];
+
+  if (game !== "all") {
+    sql += " AND game = ?";
+    params.push(game);
+  }
+
+  sql += " GROUP BY day ORDER BY day";
+
+  db.query(sql, params, (err, rows) => {
+    if (err) return res.status(500).send("Error");
+    res.json(rows);
+  });
+});
+
 app.listen(3001, () => {
   console.log("Server läuft auf Port 3001");
 });
