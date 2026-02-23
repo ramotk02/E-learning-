@@ -295,30 +295,55 @@ html, body {
 }
 
 /* manual level */
+/* manual level (FIX: no overflow) */
 .mg-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 90px 1fr; /* label + zone boutons */
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 14px;
 }
 
 .mg-muted {
-  opacity: 0.9;
-  font-weight: 800;
+  opacity: 0.95;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 0.2px;
 }
 
 .mg-levelBtns {
   display: flex;
-  gap: 10px;
+  gap: 12px;
+  justify-content: flex-start;
+  flex-wrap: wrap;      /* ✅ IMPORTANT: évite débordement */
+  min-width: 0;         /* ✅ IMPORTANT */
 }
 
-.mg-msg {
-  margin-top: 2px;
-  background: rgba(0,0,0,0.22);
-  border: 1px solid rgba(255,255,255,0.14);
-  border-radius: 16px;
-  padding: 12px 14px;
+.mg-levelBtns .mg-btn {
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  font-size: 14px;
   font-weight: 900;
+  min-width: 92px;      /* ✅ assez large mais pas énorme */
+
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.22);
+  transform: none;
+}
+
+.mg-levelBtns .mg-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.18);
+}
+
+.mg-levelBtns .mg-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  background: rgba(0,0,0,0.18);
+  border-color: rgba(255,255,255,0.10);
+  box-shadow: none;
 }
 
 /* saved screen */
@@ -354,7 +379,36 @@ html, body {
   opacity: 0.92;
   font-weight: 700;
 }
+.mg-levelBtns .mg-btn {
+  height: 46px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 900;
+  min-width: 90px;
 
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.20);
+
+  transform: none;
+}
+
+/* hover */
+.mg-levelBtns .mg-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.16);
+}
+
+/* disabled (quand Auto-Level ON) */
+.mg-levelBtns .mg-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  background: rgba(0,0,0,0.18);
+  border-color: rgba(255,255,255,0.10);
+  box-shadow: none;
+}
 /* responsive (if small screen allow scroll) */
 @media (max-width: 1050px) {
   html, body { overflow: auto; }
@@ -367,5 +421,10 @@ html, body {
   }
   .mg-stats {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .mg-levelBtns{
+    min-width: 0;
+    justify-content: flex-start;
+    flex-wrap: wrap;
   }
 }

@@ -1,16 +1,14 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Landing from "./pages/LandingPage/Landing";
-import MathGame from "./games/math/MathGame";
-import Dashboard from "./pages/Dashboard/dashboard";
+import Login from "./pages/Auth/Login";
+import Dashboard from "./pages/Dashboard";
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/Dashboard" element={<Dashboard />} />
-        <Route path="/math" element={<MathGame />} />
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Landing />} />
+      <Route path="/login" element={<Login />} /> 
+      <Route path="/dashboard" element={<Dashboard />} />
+    </Routes>
   );
 }

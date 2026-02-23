@@ -6,19 +6,83 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const JWT_SECRET= "CHANGE_ME_SECRET";
+
+
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "root",
-  database: "e-leraning", // genau so wie deine DB heißt
+  database: "e-leraning", 
 });
 
+
+app.post("/auth/register", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!username || !password)
+      return res.status(400).json({ error: "username/password missing" });
+
+    const hash = await bcrypt.hash(password, 10);
+
+    db.query(
+      "INSERT INTO users (username, password_hash) VALUES (?, ?)",
+      [username, hash],
+      (err, result) => {
+        if (err) {
+          if (err.code === "ER_DUP_ENTRY")
+            return res.status(409).json({ error: "Username already used" });
+          console.log(err);
+          return res.status(500).json({ error: "Server error" });
+        }
+
+        const user = { id: result.insertId, username };
+        const token = jwt.sign(user, JWT_SECRET, { expiresIn: "7d" });
+
+        res.json({ token, user });
+      }
+    );
+  } catch (e) {
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+// LOGIN
+app.post("/auth/login", (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password)
+    return res.status(400).json({ error: "username/password missing" });
+
+  db.query(
+    "SELECT * FROM users WHERE username = ? LIMIT 1",
+    [username],
+    async (err, rows) => {
+      if (err) return res.status(500).json({ error: "Server error" });
+      if (!rows || rows.length === 0)
+        return res.status(401).json({ error: "Invalid login" });
+
+      const u = rows[0];
+      const ok = await bcrypt.compare(password, u.password_hash);
+      if (!ok) return res.status(401).json({ error: "Invalid login" });
+
+      const user = { id: u.id, username: u.username };
+      const token = jwt.sign(user, JWT_SECRET, { expiresIn: "7d" });
+
+      res.json({ token, user });
+    }
+  );
+});
 // optional: DB errors loggen (verhindert "silent" crashes)
 db.on("error", (err) => {
   console.log("DB ERROR:", err);
 });
 
-// ✅ SAVE (Session speichern)
+//  SAVE (Session speichern)
 app.post("/save", (req, res) => {
   console.log("BODY:", req.body);
 

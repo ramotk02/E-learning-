@@ -12,8 +12,6 @@ export default function Landing() {
         </div>
 
         <div className="hero-box">
-        
-
           <h2 className="hero-title">
             Learn. Understand. <span>Grow.</span>
           </h2>
@@ -29,6 +27,8 @@ export default function Landing() {
             <Link className="btn btn-primary" to="/dashboard">
               Let&apos;s Study
             </Link>
+
+            {/* ✅ Login route */}
             <Link className="btn btn-secondary" to="/login">
               Login
             </Link>
@@ -70,8 +70,6 @@ export default function Landing() {
           </p>
         </article>
       </section>
-
-     
     </div>
   );
 }
