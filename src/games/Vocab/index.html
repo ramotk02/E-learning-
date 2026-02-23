@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vocabulary Quiz</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    <h1>Vocabulary Quiz</h1>
+
+    <div id="info">
+      <span id="timer">Time: 180</span>
+      <span id="score">Score: 0</span>
+    </div>
+
+    <div id="level-select">
+      <h2>Select Level</h2>
+      <button onclick="setLevel('easy')">Easy</button>
+      <button onclick="setLevel('medium')">Medium</button>
+      <button onclick="setLevel('hard')">Hard</button>
+    </div>
+
+    <div id="quiz"></div>
+
+    <button id="startBtn">Start Quiz</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
