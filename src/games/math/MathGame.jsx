@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { generateQuestion } from "./mathGenerator";
 import "./MathGame.css";
 
@@ -13,6 +14,7 @@ function getPlayerId() {
 
 export default function MathGame() {
   const playerId = useMemo(() => getPlayerId(), []);
+  const navigate = useNavigate();
 
   const [started, setStarted] = useState(false);
 
@@ -190,7 +192,7 @@ export default function MathGame() {
     return () => clearInterval(interval);
   }, [started, finished, level, autoLevel, total, maxQuestions]);
 
-  // SAVED
+  // ===== SAVED SCREEN =====
   if (saved) {
     return (
       <div className="mg-page">
@@ -199,12 +201,12 @@ export default function MathGame() {
             <h2>✅ Gespeichert!</h2>
             <p>Deine Sitzung wurde gespeichert.</p>
 
-            <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
               <button className="mg-btn primary" onClick={startGame}>
                 Replay
               </button>
-              <button className="mg-btn" onClick={() => setStarted(false)}>
-                Exit
+              <button className="mg-btn" onClick={() => navigate("/dashboard")}>
+                Zurück zum Dashboard
               </button>
             </div>
           </div>
@@ -213,13 +215,17 @@ export default function MathGame() {
     );
   }
 
-  // SETUP
+  // ===== SETUP =====
   if (!started) {
     return (
       <div className="mg-page">
         <div className="mg-shell">
           <aside className="mg-side">
             <div className="mg-brand">
+              <button className="mg-backBtn" onClick={() => navigate("/dashboard")}>
+                ← Zurück
+              </button>
+
               <div className="mg-title">Math Setup</div>
               <div className="mg-sub">Edu-Exos • Rechnen mit Timer & Level</div>
               <div className="mg-pill">Player: {playerId.slice(0, 8)}…</div>
@@ -282,7 +288,7 @@ export default function MathGame() {
             <div className="mg-qBox">
               <div className="mg-qLabel">Info</div>
               <div className="mg-qText" style={{ fontSize: 22 }}>
-                Starte das Spiel links – viel Erfolg! 🚀
+                Starte das Spiel links – viel Erfolg!
               </div>
             </div>
           </main>
@@ -291,12 +297,16 @@ export default function MathGame() {
     );
   }
 
-  // GAME
+  // ===== GAME =====
   return (
     <div className="mg-page">
       <div className="mg-shell">
         <aside className="mg-side">
           <div className="mg-brand">
+            <button className="mg-backBtn" onClick={() => navigate("/dashboard")}>
+              ← Zurück
+            </button>
+
             <div className="mg-title">Math Game</div>
             <div className="mg-sub">Edu-Exos • Session läuft</div>
             <div className="mg-pill">
@@ -404,11 +414,7 @@ export default function MathGame() {
               placeholder="Antwort eingeben…"
             />
 
-            <button
-              className="mg-btn primary"
-              disabled={finished}
-              onClick={checkAnswer}
-            >
+            <button className="mg-btn primary" disabled={finished} onClick={checkAnswer}>
               Check
             </button>
 

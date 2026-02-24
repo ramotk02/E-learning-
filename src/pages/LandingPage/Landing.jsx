@@ -4,72 +4,112 @@ import bild1 from "./Bild1.png";
 
 export default function Landing() {
   return (
-    <div className="landing">
-      <section className="hero">
-        <div className="poster">
-          <img className="poster-img" src={bild1} alt="E-learning" />
-          <div className="poster-glow" />
-        </div>
-
-        <div className="hero-box">
-          <h2 className="hero-title">
-            Learn. Understand. <span>Grow.</span>
-          </h2>
-
-          <p className="hero-text">
-            Welcome to our learning platform — a place where knowledge becomes
-            simple, clear, and practical. Here, you can explore topics step by
-            step and understand how things work in the real world. We focus on
-            learning by understanding, not just memorizing.
-          </p>
-
-          <div className="hero-actions">
-            <Link className="btn btn-primary" to="/dashboard">
-              Let&apos;s Study
-            </Link>
-
-            {/* ✅ Login route */}
-            <Link className="btn btn-secondary" to="/login">
-              Login
-            </Link>
+    <div className="lp">
+      <div className="lp-shell">
+        <header className="lp-header">
+          <div className="lp-brand">
+            <div className="lp-logo" aria-hidden="true">e</div>
+            <div className="lp-brandText">
+              <div className="lp-brandName">Edu-Exos</div>
+              <div className="lp-brandSub">learn smart • stay consistent</div>
+            </div>
           </div>
-        </div>
-      </section>
 
-      <section className="cards">
-        <article className="card card-left">
-          <div className="card-top">
-            <span className="card-icon"></span>
-            <h3 className="card-title">A good foundation</h3>
-          </div>
-          <p className="card-text">
-            Learning website is designed to be easy to use and accessible for everyone.
-            Clear navigation and mobile compatibility allow learners to focus without distractions.
-          </p>
-        </article>
+          <nav className="lp-nav">
+            <Link className="lp-link" to="/Login">Login</Link>
+            <Link className="lp-link lp-linkGhost" to="/register">Register</Link>
+          </nav>
+        </header>
 
-        <article className="card">
-          <div className="card-top">
-            <span className="card-icon"></span>
-            <h3 className="card-title">High quality content</h3>
-          </div>
-          <p className="card-text">
-            Lessons are well structured, up to date and explained in a simple way.
-            Interactive elements such as quizzes keep learners engaged.
-          </p>
-        </article>
+        <main className="lp-main">
+          <section className="lp-left">
+            <div className="lp-kicker">Routine • Progress • Focus</div>
 
-        <article className="card card-right">
-          <div className="card-top">
-            <span className="card-icon"></span>
-            <h3 className="card-title">E-learning Platform</h3>
-          </div>
-          <p className="card-text">
-            The platform supports flexible and personalized learning.
-            Users can learn at their own pace, track progress and reach goals.
-          </p>
-        </article>
-      </section>
+            <h1 className="lp-title">
+              Learn better with a <span>simple</span> routine.
+            </h1>
+
+            <p className="lp-text">
+              Kurze Übungen in Mathe, Vokabeln und Konjugation.
+              Mit Auto-Level, Timer und Statistiken — ohne unnötigen Stress.
+            </p>
+
+            <div className="lp-actions">
+              <Link className="lp-btn lp-btnPrimary" to="/register">
+                Konto erstellen
+              </Link>
+              <Link className="lp-btn lp-btnSecondary" to="/login">
+                Einloggen
+              </Link>
+              <Link className="lp-btn lp-btnGhost" to="/dashboard">
+                Als Gast weiter
+              </Link>
+            </div>
+
+            <div className="lp-features">
+              <div className="lp-feature">
+                <div className="lp-featureIcon">⏱️</div>
+                <div>
+                  <div className="lp-featureTitle">Mathe</div>
+                  <div className="lp-featureText">Timer + Level-System</div>
+                </div>
+              </div>
+
+              <div className="lp-feature">
+                <div className="lp-featureIcon">🧠</div>
+                <div>
+                  <div className="lp-featureTitle">Vokabeln</div>
+                  <div className="lp-featureText">Üben & Wiederholen</div>
+                </div>
+              </div>
+
+              <div className="lp-feature">
+                <div className="lp-featureIcon">🔁</div>
+                <div>
+                  <div className="lp-featureTitle">Konjugation</div>
+                  <div className="lp-featureText">Zeiten & Verben</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="lp-micro">
+              <div className="lp-pill">Auto-Level</div>
+              <div className="lp-pill">Streaks</div>
+              <div className="lp-pill">Stats</div>
+              <div className="lp-pill">Short sessions</div>
+            </div>
+          </section>
+
+          <section className="lp-right">
+            <div className="lp-imageCard">
+              <div className="lp-imageGlow" aria-hidden="true" />
+              <img className="lp-img" src={bild1} alt="Learning poster" />
+            </div>
+
+            <div className="lp-note">
+              <div className="lp-noteTop">
+                <div className="lp-noteDot" aria-hidden="true" />
+                <div className="lp-noteTitle">Tipp</div>
+              </div>
+
+              <div className="lp-noteText">
+                Starte als Gast oder erstelle ein Konto, damit deine Sessions gespeichert werden.
+              </div>
+
+              <div className="lp-noteActions">
+                <Link className="lp-miniLink" to="/register">Account erstellen →</Link>
+                <Link className="lp-miniLink" to="/dashboard">Gastmodus →</Link>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <footer className="lp-footer">
+          <span>© {new Date().getFullYear()} Edu-Exos</span>
+          <span className="lp-dot">•</span>
+          <span>Simple. Modern. Focused.</span>
+        </footer>
+      </div>
     </div>
   );
 }

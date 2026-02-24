@@ -22,7 +22,11 @@ function getPlayerId() {
 }
 
 function getDisplayName() {
-  return localStorage.getItem("display_name") || "Gast";
+  return (
+    localStorage.getItem("display_name") ||
+    localStorage.getItem("username") ||
+    "Gast"
+  );
 }
 
 function n(v, fallback = 0) {
@@ -38,6 +42,16 @@ function shortId(id) {
   if (!id) return "";
   return id.slice(0, 8) + "…" + id.slice(-4);
 }
+
+const handleLogout = () => {
+  // Supprime les données de connexion
+  localStorage.removeItem("token");
+  localStorage.removeItem("display_name");
+  localStorage.removeItem("player_id");
+
+  // Redirection vers login
+  window.location.href = "/login";
+};
 
 function Kpi({ label, value }) {
   return (
@@ -120,6 +134,11 @@ export default function Dashboard() {
                 {shortId(playerId)}
               </span>
             </div>
+
+            {/* ✅ BOUTON LOGOUT */}
+            <button className="db-logout" onClick={handleLogout}>
+              Abmelden
+            </button>
           </div>
 
           <div className="db-menu">
@@ -129,7 +148,6 @@ export default function Dashboard() {
               Mathe <span>→</span>
             </Link>
 
-            {/* si pas encore de routes, mets to="#" */}
             <Link to="/vocab" className="db-menu-btn">
               Vokabeln <span>→</span>
             </Link>
@@ -165,7 +183,10 @@ export default function Dashboard() {
                 <Kpi label="Ø Score" value={n(overall.avgScore).toFixed(2)} />
                 <Kpi label="Best" value={n(overall.bestScore)} />
                 <Kpi label="Genauigkeit" value={pct(overall.avgAccuracy)} />
-                <Kpi label="Ø Dauer" value={`${Math.round(n(overall.avgDuration))}s`} />
+                <Kpi
+                  label="Ø Dauer"
+                  value={`${Math.round(n(overall.avgDuration))}s`}
+                />
               </div>
             )}
           </section>
@@ -241,90 +262,78 @@ export default function Dashboard() {
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart
                           data={daily}
-                          margin={{ top: 10, right: 25, left: 0, bottom: 10 }}
+                          margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
                         >
+                          {/* Grid très léger */}
                           <CartesianGrid
-                            stroke="rgba(255,255,255,0.18)"
-                            strokeDasharray="4 6"
+                            stroke="rgba(255,255,255,0.06)"
+                            strokeDasharray="3 10"
                           />
 
                           <XAxis
                             dataKey="day"
-                            stroke="rgba(255,255,255,0.92)"
-                            tick={{
-                              fill: "rgba(255,255,255,0.95)",
-                              fontSize: 12,
-                            }}
-                            tickMargin={10}
+                            stroke="rgba(255,255,255,0.50)"
+                            tick={{ fill: "rgba(255,255,255,0.75)", fontSize: 12 }}
+                            axisLine={false}
+                            tickLine={false}
                           />
 
-                          {/* Score (links) */}
                           <YAxis
                             yAxisId="left"
-                            stroke="rgba(255,255,255,0.92)"
-                            tick={{
-                              fill: "rgba(255,255,255,0.95)",
-                              fontSize: 12,
-                            }}
+                            stroke="rgba(255,255,255,0.50)"
+                            tick={{ fill: "rgba(255,255,255,0.75)", fontSize: 12 }}
+                            axisLine={false}
+                            tickLine={false}
                             domain={[0, "dataMax + 2"]}
                             width={36}
                           />
 
-                          {/* Sessions (rechts) */}
                           <YAxis
                             yAxisId="right"
                             orientation="right"
-                            stroke="rgba(255,255,255,0.92)"
-                            tick={{
-                              fill: "rgba(255,255,255,0.95)",
-                              fontSize: 12,
-                            }}
+                            stroke="rgba(255,255,255,0.50)"
+                            tick={{ fill: "rgba(255,255,255,0.75)", fontSize: 12 }}
+                            axisLine={false}
+                            tickLine={false}
                             allowDecimals={false}
                             domain={[0, "dataMax + 1"]}
                             width={36}
                           />
 
+                          {/* Tooltip clean */}
                           <Tooltip
+                            cursor={{ stroke: "rgba(255,255,255,0.10)", strokeWidth: 1 }}
                             contentStyle={{
-                              background: "rgba(15,10,35,0.94)",
-                              border: "1px solid rgba(255,255,255,0.18)",
-                              borderRadius: 12,
+                              background: "rgba(10,15,31,0.95)",
+                              border: "1px solid rgba(255,255,255,0.15)",
+                              borderRadius: 14,
                               color: "white",
+                              boxShadow: "0 20px 60px rgba(0,0,0,0.35)"
                             }}
-                            labelStyle={{
-                              color: "rgba(255,255,255,0.95)",
-                            }}
+                            labelStyle={{ fontWeight: 900 }}
                           />
 
-                          <Legend
-                            wrapperStyle={{
-                              color: "rgba(255,255,255,0.95)",
-                              paddingTop: 8,
-                            }}
-                          />
-
-                          {/* Ø Score (cyan) */}
+                          {/* COURBE SCORE */}
                           <Line
                             yAxisId="left"
-                            type="monotone"
+                            type="stepAfter"
                             dataKey="avgScore"
                             name="Ø Score"
                             stroke="#20E3FF"
                             strokeWidth={4}
-                            dot={{ r: 4, strokeWidth: 2 }}
-                            activeDot={{ r: 7 }}
+                            dot={false}
+                            activeDot={false}
                           />
 
-                          {/* Sitzungen (pink) */}
                           <Line
                             yAxisId="right"
-                            type="monotone"
+                            type="stepAfter"
                             dataKey="sessions"
                             name="Sitzungen"
                             stroke="#FF6B9A"
                             strokeWidth={4}
-                            dot={{ r: 4, strokeWidth: 2 }}
-                            activeDot={{ r: 7 }}
+                            dot={false}
+                            activeDot={false}
                           />
                         </LineChart>
                       </ResponsiveContainer>

@@ -53,7 +53,7 @@ export default function Register() {
         </form>
 
         <div className="auth-footer">
-          Schon ein Konto? <Link to="/login">Login</Link>
+          Schon ein Konto? <Link to="/Login">Login</Link>
         </div>
       </div>
     </div>
