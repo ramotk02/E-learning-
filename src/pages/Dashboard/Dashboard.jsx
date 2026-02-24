@@ -1,3 +1,4 @@
+// Dashboard.jsx
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -8,7 +9,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
 } from "recharts";
 import "./Dashboard.css";
 
@@ -43,15 +43,14 @@ function shortId(id) {
   return id.slice(0, 8) + "…" + id.slice(-4);
 }
 
-const handleLogout = () => {
-  // Supprime les données de connexion
+function handleLogout() {
   localStorage.removeItem("token");
   localStorage.removeItem("display_name");
   localStorage.removeItem("player_id");
-
-  // Redirection vers login
+  localStorage.removeItem("username");
+  localStorage.removeItem("user_id");
   window.location.href = "/login";
-};
+}
 
 function Kpi({ label, value }) {
   return (
@@ -68,8 +67,9 @@ export default function Dashboard() {
 
   const [overall, setOverall] = useState(null);
   const [byGame, setByGame] = useState([]);
-  const [daily, setDaily] = useState([]);
-  const [days, setDays] = useState(30);
+
+  // Chart data (par session)
+  const [sessionSeries, setSessionSeries] = useState([]);
   const [dailyGame, setDailyGame] = useState("all");
 
   // overall + by game
@@ -85,22 +85,15 @@ export default function Dashboard() {
       .catch(console.log);
   }, [playerId]);
 
-  // daily chart
+  // sessions chart (par partie)
   useEffect(() => {
     fetch(
-      `http://localhost:3001/stats/daily?playerId=${playerId}&game=${dailyGame}&days=${days}`
+      `http://localhost:3001/stats/sessions?playerId=${playerId}&game=${dailyGame}&limit=60`
     )
       .then((r) => r.json())
-      .then((rows) => {
-        const formatted = (rows || []).map((x) => ({
-          day: String(x.day).slice(5, 10), // "2026-02-17" -> "02-17"
-          sessions: n(x.sessions),
-          avgScore: Number(n(x.avgScore).toFixed(2)),
-        }));
-        setDaily(formatted);
-      })
+      .then((rows) => setSessionSeries(rows || []))
       .catch(console.log);
-  }, [playerId, dailyGame, days]);
+  }, [playerId, dailyGame]);
 
   const gameRows = useMemo(() => {
     const base = {
@@ -135,7 +128,6 @@ export default function Dashboard() {
               </span>
             </div>
 
-            {/* ✅ BOUTON LOGOUT */}
             <button className="db-logout" onClick={handleLogout}>
               Abmelden
             </button>
@@ -183,16 +175,13 @@ export default function Dashboard() {
                 <Kpi label="Ø Score" value={n(overall.avgScore).toFixed(2)} />
                 <Kpi label="Best" value={n(overall.bestScore)} />
                 <Kpi label="Genauigkeit" value={pct(overall.avgAccuracy)} />
-                <Kpi
-                  label="Ø Dauer"
-                  value={`${Math.round(n(overall.avgDuration))}s`}
-                />
+                <Kpi label="Ø Dauer" value={`${Math.round(n(overall.avgDuration))}s`} />
               </div>
             )}
           </section>
 
           {/* TABLE + CHART */}
-          <section className="db-panel db-grow">
+          <section className="db-panel">
             <div className="db-split">
               {/* TABLE */}
               <div className="db-block">
@@ -224,10 +213,10 @@ export default function Dashboard() {
 
               {/* CHART */}
               <div className="db-block">
-                <div className="db-block-head db-block-headRow">
+                <div className="db-block-headRow">
                   <div>
-                    <div className="db-block-title">Verlauf</div>
-                    <div className="db-block-sub">Letzte {days} Tage</div>
+                    <div className="db-block-title">Verlauf (Sessions)</div>
+                    <div className="db-block-sub">Letzte 60 Sessions</div>
                   </div>
 
                   <div className="db-controls">
@@ -241,37 +230,20 @@ export default function Dashboard() {
                       <option value="vocab">Vokabeln</option>
                       <option value="conjugation">Konjugation</option>
                     </select>
-
-                    <select
-                      className="db-select"
-                      value={days}
-                      onChange={(e) => setDays(Number(e.target.value))}
-                    >
-                      <option value={7}>7</option>
-                      <option value={14}>14</option>
-                      <option value={30}>30</option>
-                    </select>
                   </div>
                 </div>
 
                 <div className="db-chart">
-                  {daily.length === 0 ? (
+                  {sessionSeries.length === 0 ? (
                     <div className="db-loading">Noch keine Daten…</div>
                   ) : (
                     <div className="db-chartInner">
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart
-                          data={daily}
-                          margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
-                        >
-                          {/* Grid très léger */}
-                          <CartesianGrid
-                            stroke="rgba(255,255,255,0.06)"
-                            strokeDasharray="3 10"
-                          />
+                        <LineChart data={sessionSeries} margin={{ top: 10, right: 16, left: 0, bottom: 8 }}>
+                          <CartesianGrid stroke="rgba(255,255,255,0.06)" strokeDasharray="3 10" />
 
                           <XAxis
-                            dataKey="day"
+                            dataKey="idx"
                             stroke="rgba(255,255,255,0.50)"
                             tick={{ fill: "rgba(255,255,255,0.75)", fontSize: 12 }}
                             axisLine={false}
@@ -279,7 +251,6 @@ export default function Dashboard() {
                           />
 
                           <YAxis
-                            yAxisId="left"
                             stroke="rgba(255,255,255,0.50)"
                             tick={{ fill: "rgba(255,255,255,0.75)", fontSize: 12 }}
                             axisLine={false}
@@ -288,19 +259,6 @@ export default function Dashboard() {
                             width={36}
                           />
 
-                          <YAxis
-                            yAxisId="right"
-                            orientation="right"
-                            stroke="rgba(255,255,255,0.50)"
-                            tick={{ fill: "rgba(255,255,255,0.75)", fontSize: 12 }}
-                            axisLine={false}
-                            tickLine={false}
-                            allowDecimals={false}
-                            domain={[0, "dataMax + 1"]}
-                            width={36}
-                          />
-
-                          {/* Tooltip clean */}
                           <Tooltip
                             cursor={{ stroke: "rgba(255,255,255,0.10)", strokeWidth: 1 }}
                             contentStyle={{
@@ -308,29 +266,16 @@ export default function Dashboard() {
                               border: "1px solid rgba(255,255,255,0.15)",
                               borderRadius: 14,
                               color: "white",
-                              boxShadow: "0 20px 60px rgba(0,0,0,0.35)"
+                              boxShadow: "0 20px 60px rgba(0,0,0,0.35)",
                             }}
                             labelStyle={{ fontWeight: 900 }}
                           />
 
-                          {/* COURBE SCORE */}
                           <Line
-                            yAxisId="left"
                             type="stepAfter"
-                            dataKey="avgScore"
-                            name="Ø Score"
+                            dataKey="score"
+                            name="Score"
                             stroke="#20E3FF"
-                            strokeWidth={4}
-                            dot={false}
-                            activeDot={false}
-                          />
-
-                          <Line
-                            yAxisId="right"
-                            type="stepAfter"
-                            dataKey="sessions"
-                            name="Sitzungen"
-                            stroke="#FF6B9A"
                             strokeWidth={4}
                             dot={false}
                             activeDot={false}

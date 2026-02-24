@@ -2,24 +2,32 @@ const express = require("express");
 const mysql = require("mysql2");
 const cors = require("cors");
 
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const JWT_SECRET= "CHANGE_ME_SECRET";
-
+const JWT_SECRET = "CHANGE_ME_SECRET";
 
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "root",
-  database: "e-leraning", 
+  database: "e-leraning",
 });
 
+// optional: DB errors loggen (verhindert "silent" crashes)
+db.on("error", (err) => {
+  console.log("DB ERROR:", err);
+});
 
+/* =========================
+   AUTH
+========================= */
+
+// REGISTER
 app.post("/auth/register", async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -77,12 +85,10 @@ app.post("/auth/login", (req, res) => {
     }
   );
 });
-// optional: DB errors loggen (verhindert "silent" crashes)
-db.on("error", (err) => {
-  console.log("DB ERROR:", err);
-});
 
-//  SAVE (Session speichern)
+/* =========================
+   SAVE SESSION
+========================= */
 app.post("/save", (req, res) => {
   console.log("BODY:", req.body);
 
@@ -106,6 +112,10 @@ app.post("/save", (req, res) => {
   });
 });
 
+/* =========================
+   STATS
+========================= */
+
 // ✅ SUMMARY für ein Spiel (default math)
 app.get("/stats/summary", (req, res) => {
   const { playerId, game = "math" } = req.query;
@@ -124,43 +134,15 @@ app.get("/stats/summary", (req, res) => {
   `;
 
   db.query(sql, [playerId, game], (err, rows) => {
-    if (err) return res.status(500).send("Error");
+    if (err) {
+      console.log("SQL ERROR:", err);
+      return res.status(500).send("Error");
+    }
     res.json(rows[0]);
   });
 });
 
-// ✅ DAILY (für "all" oder ein game)
-app.get("/stats/daily", (req, res) => {
-  const { playerId, game = "all", days = 30 } = req.query;
-
-  if (!playerId) return res.status(400).json({ error: "playerId missing" });
-
-  let sql = `
-    SELECT
-      DATE(created_at) AS day,
-      COUNT(*) AS sessions,
-      AVG(score) AS avgScore
-    FROM sessions
-    WHERE player_id = ?
-      AND created_at >= NOW() - INTERVAL ? DAY
-  `;
-
-  const params = [playerId, Number(days)];
-
-  if (game !== "all") {
-    sql += " AND game = ?";
-    params.push(game);
-  }
-
-  sql += " GROUP BY day ORDER BY day";
-
-  db.query(sql, params, (err, rows) => {
-    if (err) return res.status(500).send("Error");
-    res.json(rows);
-  });
-});
-
-// ✅ BY-GAME (neu): Stats pro Spiel
+// ✅ BY-GAME: Stats pro Spiel
 app.get("/stats/by-game", (req, res) => {
   const { playerId } = req.query;
 
@@ -180,10 +162,15 @@ app.get("/stats/by-game", (req, res) => {
   `;
 
   db.query(sql, [playerId], (err, rows) => {
-    if (err) return res.status(500).send("Error");
+    if (err) {
+      console.log("SQL ERROR:", err);
+      return res.status(500).send("Error");
+    }
     res.json(rows);
   });
 });
+
+// ✅ OVERALL: Stats über alle Spiele
 app.get("/stats/overall", (req, res) => {
   const { playerId } = req.query;
 
@@ -211,6 +198,7 @@ app.get("/stats/overall", (req, res) => {
   });
 });
 
+// ✅ DAILY: 1 point par jour (moyennes)
 app.get("/stats/daily", (req, res) => {
   const { playerId, game = "all", days = 30 } = req.query;
 
@@ -237,8 +225,56 @@ app.get("/stats/daily", (req, res) => {
   sql += " GROUP BY day ORDER BY day";
 
   db.query(sql, params, (err, rows) => {
-    if (err) return res.status(500).send("Error");
+    if (err) {
+      console.log("SQL ERROR:", err);
+      return res.status(500).send("Error");
+    }
     res.json(rows);
+  });
+});
+
+// ✅ SESSIONS: 1 point par session (pour courbe qui monte/descend à chaque partie)
+app.get("/stats/sessions", (req, res) => {
+  const { playerId, game = "all", limit = 60 } = req.query;
+
+  if (!playerId) return res.status(400).json({ error: "playerId missing" });
+
+  let sql = `
+    SELECT id, score, total, game, created_at
+    FROM sessions
+    WHERE player_id = ?
+  `;
+
+  const params = [playerId];
+
+  if (game !== "all") {
+    sql += " AND game = ?";
+    params.push(game);
+  }
+
+  sql += `
+    ORDER BY created_at ASC
+    LIMIT ?
+  `;
+
+  params.push(Math.min(Number(limit) || 60, 200));
+
+  db.query(sql, params, (err, rows) => {
+    if (err) {
+      console.log("SQL ERROR:", err);
+      return res.status(500).send("Error");
+    }
+
+    const out = (rows || []).map((r, i) => ({
+      idx: i + 1,
+      score: Number(r.score),
+      total: Number(r.total),
+      accuracy: r.total ? Number((r.score / r.total).toFixed(3)) : 0,
+      day: String(r.created_at).slice(5, 10),
+      game: r.game,
+    }));
+
+    res.json(out);
   });
 });
 
