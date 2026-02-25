@@ -1,24 +1,22 @@
-html, body {
+
+
+html, body{
   height: 100%;
   margin: 0;
-  overflow: hidden;        
+  padding: 0;
+  overflow: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+body::-webkit-scrollbar{ width:0; height:0; }
 
-body{
-  position: static;        
-}
+*,
+*::before,
+*::after{ box-sizing: border-box; }
 
-.db-page{
-  height: 100vh;           
-  padding: 28px;
-  overflow: hidden;        
-  box-sizing: border-box;  
-}
-
-.db-shell{
-  height: calc(100vh - 56px); 
-  min-height: 0;
-  min-width: 0;
+img, video, canvas, svg{
+  max-width: 100%;
+  height: auto;
 }
 
 :root{
@@ -29,6 +27,10 @@ body{
   --bg2: #0f1732;
   --bg3: #0c132b;
 
+  --violet: #8b5cf6;
+  --pink: #ec4899;
+  --cyan: #22d3ee;
+
   --panelA: rgba(255,255,255,0.13);
   --panelB: rgba(255,255,255,0.08);
   --line: rgba(255,255,255,0.14);
@@ -38,15 +40,19 @@ body{
   --grid: rgba(255,255,255,0.14);
 }
 
-*{ box-sizing: border-box; }
-
-.db-page{
-  min-height: 100vh;
-  padding: 28px;
+body{
   font-family: Inter, system-ui, Arial, sans-serif;
   color: var(--text);
+  background: #0a0f1f;
+}
+
+.db-page{
+  height: 100vh;
+  width: 100%;
+  padding: 28px 40px;   
   position: relative;
   overflow: hidden;
+  box-sizing: border-box;
 
   background:
     radial-gradient(1100px 750px at 18% 12%, rgba(139,92,246,0.40), transparent 62%),
@@ -59,26 +65,53 @@ body{
   content:"";
   position:absolute;
   inset:0;
+  pointer-events:none;
   background:
     linear-gradient(to right, var(--grid) 1.5px, transparent 1.5px),
-    linear-gradient(to bottom, var(--grid) 1.5px, transparent 1.5px);
-  background-size: 64px 64px;
-  opacity: 0.55;
+    linear-gradient(to bottom, var(--grid) 1.5px, transparent 1.5px),
+    radial-gradient(circle at 50% 35%, rgba(255,255,255,0.10), transparent 58%);
+  background-size: 64px 64px, 64px 64px, 100% 100%;
+  opacity: 0.7;
+  animation: dbGridMove 40s linear infinite;
+}
+
+@keyframes dbGridMove{
+  from{ background-position: 0 0, 0 0, center; }
+  to{ background-position: 64px 64px, 64px 64px, center; }
+}
+
+.db-page::after{
+  content:"";
+  position:absolute;
+  inset:-25%;
   pointer-events:none;
+  background:
+    radial-gradient(circle at 25% 25%, rgba(139,92,246,0.18), transparent 60%),
+    radial-gradient(circle at 75% 70%, rgba(236,72,153,0.13), transparent 60%),
+    radial-gradient(circle at 55% 90%, rgba(34,211,238,0.11), transparent 65%);
+  filter: blur(44px);
+  animation: dbFloat 12s ease-in-out infinite alternate;
+}
+
+@keyframes dbFloat{
+  from{ transform: translateY(-18px); }
+  to{ transform: translateY(18px); }
 }
 
 .db-shell{
   position: relative;
   z-index: 1;
-  width: min(1220px, 100%);
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 340px 1fr;
-  gap: 16px;
-  min-height: calc(100vh - 56px);
 
-  /* IMPORTANT pour éviter des tailles qui collapsent */
+  width: 100%;
+  margin: 0;
+
+  display: grid;
+  grid-template-columns: 360px 1fr; 
+  gap: 18px;
+
+  height: calc(100vh - 56px); 
   min-width: 0;
+  min-height: 0;
 }
 
 .db-side, .db-main{
@@ -90,6 +123,7 @@ body{
 
   min-width: 0;
   min-height: 0;
+  overflow: hidden;
 }
 
 .db-side{
@@ -107,7 +141,6 @@ body{
   min-width: 0;
 }
 
-/* ===== profile ===== */
 .db-profile{
   border-radius: 18px;
   border: 1px solid rgba(255,255,255,0.12);
@@ -177,7 +210,6 @@ body{
   background: rgba(255,255,255,0.11);
 }
 
-/* ===== menu ===== */
 .db-menu{
   border-radius: 18px;
   border: 1px solid rgba(255,255,255,0.12);
@@ -222,7 +254,6 @@ body{
   line-height: 1.45;
 }
 
-/* ===== panels ===== */
 .db-panel{
   border-radius: 18px;
   border: 1px solid rgba(255,255,255,0.12);
@@ -256,7 +287,7 @@ body{
   font-size: 12px;
   font-weight: 1000;
   border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(255,255,255,0.07);
+  background: linear-gradient(135deg, rgba(34,211,238,0.14), rgba(139,92,246,0.14));
 }
 
 .db-loading{
@@ -268,7 +299,6 @@ body{
   font-weight: 900;
 }
 
-/* KPI grid */
 .db-kpis{
   margin-top: 12px;
   display:grid;
@@ -298,13 +328,10 @@ body{
   letter-spacing: -0.3px;
 }
 
-/* split area */
 .db-split{
   display:grid;
   grid-template-columns: 1.1fr 0.9fr;
   gap: 14px;
-
-  /* IMPORTANT Recharts + grid */
   min-width: 0;
   min-height: 0;
 }
@@ -315,7 +342,7 @@ body{
   background: rgba(0,0,0,0.10);
   padding: 14px;
   min-width: 0;
-  overflow: hidden; /* évite micro overflow */
+  overflow: hidden;
 }
 
 .db-block-head{
@@ -358,7 +385,6 @@ body{
   font-weight: 1000;
 }
 
-/* table */
 .db-table{
   display:grid;
   gap: 8px;
@@ -387,7 +413,6 @@ body{
   text-overflow: ellipsis;
 }
 
-/* ===== CHART FIX (IMPORTANT) ===== */
 .db-chart{
   min-width: 0;
   min-height: 0;
@@ -395,14 +420,30 @@ body{
 
 .db-chartWrap{
   width: 100%;
-  height: 280px;  /* ✅ hauteur réelle => plus de -1 */
+  height: 280px;
   min-width: 0;
   min-height: 0;
 }
 
-/* responsive */
 @media (max-width: 1100px){
-  .db-shell{ grid-template-columns: 1fr; }
+  .db-page{ padding: 18px; }
+
+  .db-shell{
+    grid-template-columns: 1fr;
+    height: calc(100vh - 36px);
+    gap: 16px;
+  }
+
   .db-split{ grid-template-columns: 1fr; }
-  .db-kpis{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .db-kpis{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .db-page::before,
+  .db-page::after{
+    animation: none !important;
+  }
 }

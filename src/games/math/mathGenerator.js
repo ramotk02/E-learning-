@@ -1,6 +1,5 @@
 export function generateQuestion(level = "easy") {
 
-  // EASY : + et -
   if (level === "easy") {
     const a = Math.floor(Math.random() * 20) + 1;
     const b = Math.floor(Math.random() * 20) + 1;
@@ -14,7 +13,6 @@ export function generateQuestion(level = "easy") {
     };
   }
 
-  // MEDIUM : + - *
   if (level === "medium") {
     const ops = ["+", "-", "*"];
     const op = ops[Math.floor(Math.random() * ops.length)];
@@ -45,13 +43,11 @@ export function generateQuestion(level = "easy") {
     };
   }
 
-  // HARD : opérations OU équations
-  // 50% chance d'avoir une équation
+  
   if (Math.random() < 0.5) {
-    // ÉQUATION : ax + b = c
     const a = Math.floor(Math.random() * 8) + 2;
-    const x = Math.floor(Math.random() * 10) + 1; // vraie solution
-    const b = Math.floor(Math.random() * 20) - 10; // peut être négatif
+    const x = Math.floor(Math.random() * 10) + 1; 
+    const b = Math.floor(Math.random() * 20) - 10; 
     const c = a * x + b;
 
     const bText = b >= 0 ? `+ ${b}` : `- ${Math.abs(b)}`;
@@ -62,7 +58,6 @@ export function generateQuestion(level = "easy") {
     };
   }
 
-  // HARD : + - * /
   const ops = ["+", "-", "*", "/"];
   const op = ops[Math.floor(Math.random() * ops.length)];
 
@@ -89,7 +84,7 @@ export function generateQuestion(level = "easy") {
   if (op === "/") {
     b = Math.floor(Math.random() * 12) + 2;
     answer = Math.floor(Math.random() * 20) + 2;
-    a = answer * b; // division entière garantie
+    a = answer * b; 
   }
 
   return {

@@ -18,12 +18,10 @@ export default function MathGame() {
 
   const [started, setStarted] = useState(false);
 
-  // setup
   const [level, setLevel] = useState("easy");
   const [autoLevel, setAutoLevel] = useState(true);
   const [maxQuestions, setMaxQuestions] = useState(10);
 
-  // game state
   const [q, setQ] = useState(() => generateQuestion(level));
   const [input, setInput] = useState("");
   const [msg, setMsg] = useState("");
@@ -38,7 +36,6 @@ export default function MathGame() {
   const [finished, setFinished] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  // duration
   const [startAt, setStartAt] = useState(null);
 
   function levelUp() {
@@ -71,27 +68,28 @@ export default function MathGame() {
     setTime(10);
   }
 
-  function saveScoreToDb(scoreToSend, totalToSend, levelToSend) {
-    const durationSec = startAt ? Math.floor((Date.now() - startAt) / 1000) : 0;
+ function saveScoreToDb(scoreToSend, totalToSend, levelToSend) {
+  const durationSec = startAt ? Math.floor((Date.now() - startAt) / 1000) : 0;
+  const token = localStorage.getItem("token");
 
-    fetch("http://localhost:3001/save", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        playerId,
-        game: "math",
-        score: scoreToSend,
-        total: totalToSend,
-        level: levelToSend,
-        durationSec,
-      }),
-    })
-      .then((r) => r.text())
-      .then((txt) => {
-        if (txt === "OK") setSaved(true);
-      })
-      .catch(console.log);
-  }
+  fetch("http://localhost:3001/save", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    },
+    body: JSON.stringify({
+      game: "math",
+      score: scoreToSend,
+      total: totalToSend,
+      level: levelToSend,
+      durationSec,
+    }),
+  })
+    .then((r) => r.json())
+    .then(() => setSaved(true))
+    .catch(console.log);
+}
 
   function checkAnswer() {
     if (finished) return;
@@ -144,7 +142,6 @@ export default function MathGame() {
     }, 700);
   }
 
-  // timer
   useEffect(() => {
     if (!started) return;
 
@@ -192,7 +189,6 @@ export default function MathGame() {
     return () => clearInterval(interval);
   }, [started, finished, level, autoLevel, total, maxQuestions]);
 
-  // ===== SAVED SCREEN =====
   if (saved) {
     return (
       <div className="mg-page">
@@ -215,7 +211,6 @@ export default function MathGame() {
     );
   }
 
-  // ===== SETUP =====
   if (!started) {
     return (
       <div className="mg-page">
@@ -297,7 +292,6 @@ export default function MathGame() {
     );
   }
 
-  // ===== GAME =====
   return (
     <div className="mg-page">
       <div className="mg-shell">

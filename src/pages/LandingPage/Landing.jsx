@@ -41,9 +41,7 @@ export default function Landing() {
               <Link className="lp-btn lp-btnSecondary" to="/login">
                 Einloggen
               </Link>
-              <Link className="lp-btn lp-btnGhost" to="/dashboard">
-                Als Gast weiter
-              </Link>
+              
             </div>
 
             <div className="lp-features">
@@ -98,7 +96,6 @@ export default function Landing() {
 
               <div className="lp-noteActions">
                 <Link className="lp-miniLink" to="/register">Account erstellen →</Link>
-                <Link className="lp-miniLink" to="/dashboard">Gastmodus →</Link>
               </div>
             </div>
           </section>

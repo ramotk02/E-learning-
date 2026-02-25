@@ -336,18 +336,21 @@ function endExam() {
 
 async function saveToDB() {
   const durationSec = startAt ? Math.floor((Date.now() - startAt) / 1000) : 0;
+  const token = localStorage.getItem("token");
 
   await fetch("http://localhost:3001/save", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    },
     body: JSON.stringify({
-      playerId: getPlayerId(),
       game: "conjugation",
-      score: score,
+      score,
       total: questions.length,
       level: selectedLevel,
       durationSec
-    })
+    }),
   });
 }
 

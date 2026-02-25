@@ -1,7 +1,6 @@
 const express = require("express");
 const mysql = require("mysql2");
 const cors = require("cors");
-
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -18,10 +17,23 @@ const db = mysql.createConnection({
   database: "e-leraning",
 });
 
-// optional: DB errors loggen (verhindert "silent" crashes)
-db.on("error", (err) => {
-  console.log("DB ERROR:", err);
-});
+db.on("error", (err) => console.log("DB ERROR:", err));
+
+/* =========================
+   AUTH MIDDLEWARE
+========================= */
+function auth(req, res, next) {
+  const h = req.headers.authorization || "";
+  const token = h.startsWith("Bearer ") ? h.slice(7) : null;
+  if (!token) return res.status(401).json({ error: "No token" });
+
+  try {
+    req.user = jwt.verify(token, JWT_SECRET); // {id, username}
+    next();
+  } catch {
+    return res.status(401).json({ error: "Invalid token" });
+  }
+}
 
 /* =========================
    AUTH
@@ -87,14 +99,15 @@ app.post("/auth/login", (req, res) => {
 });
 
 /* =========================
-   SAVE SESSION
+   SAVE SESSION (SECURED)
+   player_id = user.id (from token)
 ========================= */
-app.post("/save", (req, res) => {
-  console.log("BODY:", req.body);
+app.post("/save", auth, (req, res) => {
+  const userId = req.user.id; // ✅ vrai id utilisateur
 
-  const { playerId, game, score, total, level, durationSec } = req.body;
+  const { game, score, total, level, durationSec } = req.body;
 
-  if (!playerId || !game || score === undefined || total === undefined || !level) {
+  if (!game || score === undefined || total === undefined || !level) {
     return res.status(400).json({ error: "missing fields" });
   }
 
@@ -103,23 +116,26 @@ app.post("/save", (req, res) => {
     VALUES (?, ?, ?, ?, ?, ?)
   `;
 
-  db.query(sql, [playerId, game, score, total, level, durationSec || 0], (err) => {
-    if (err) {
-      console.log("SQL ERROR:", err);
-      return res.status(500).send("Error");
+  db.query(
+    sql,
+    [userId, game, score, total, level, durationSec || 0],
+    (err) => {
+      if (err) {
+        console.log("SQL ERROR:", err);
+        return res.status(500).send("Error");
+      }
+      res.json({ ok: true });
     }
-    res.send("OK");
-  });
+  );
 });
 
 /* =========================
    STATS
+   (playerId = user_id)
 ========================= */
 
-// ✅ SUMMARY für ein Spiel (default math)
-app.get("/stats/summary", (req, res) => {
-  const { playerId, game = "math" } = req.query;
-
+app.get("/stats/overall", (req, res) => {
+  const { playerId } = req.query;
   if (!playerId) return res.status(400).json({ error: "playerId missing" });
 
   const sql = `
@@ -130,22 +146,17 @@ app.get("/stats/summary", (req, res) => {
       AVG(duration_sec) AS avgDuration,
       AVG(score / NULLIF(total,0)) AS avgAccuracy
     FROM sessions
-    WHERE player_id = ? AND game = ?
+    WHERE player_id = ?
   `;
 
-  db.query(sql, [playerId, game], (err, rows) => {
-    if (err) {
-      console.log("SQL ERROR:", err);
-      return res.status(500).send("Error");
-    }
+  db.query(sql, [playerId], (err, rows) => {
+    if (err) return res.status(500).send("Error");
     res.json(rows[0]);
   });
 });
 
-// ✅ BY-GAME: Stats pro Spiel
 app.get("/stats/by-game", (req, res) => {
   const { playerId } = req.query;
-
   if (!playerId) return res.status(400).json({ error: "playerId missing" });
 
   const sql = `
@@ -162,82 +173,13 @@ app.get("/stats/by-game", (req, res) => {
   `;
 
   db.query(sql, [playerId], (err, rows) => {
-    if (err) {
-      console.log("SQL ERROR:", err);
-      return res.status(500).send("Error");
-    }
+    if (err) return res.status(500).send("Error");
     res.json(rows);
   });
 });
-
-// ✅ OVERALL: Stats über alle Spiele
-app.get("/stats/overall", (req, res) => {
-  const { playerId } = req.query;
-
-  if (!playerId) {
-    return res.status(400).json({ error: "playerId missing" });
-  }
-
-  const sql = `
-    SELECT
-      COUNT(*) AS sessions,
-      AVG(score) AS avgScore,
-      MAX(score) AS bestScore,
-      AVG(duration_sec) AS avgDuration,
-      AVG(score / NULLIF(total,0)) AS avgAccuracy
-    FROM sessions
-    WHERE player_id = ?
-  `;
-
-  db.query(sql, [playerId], (err, rows) => {
-    if (err) {
-      console.log("SQL ERROR:", err);
-      return res.status(500).send("Error");
-    }
-    res.json(rows[0]);
-  });
-});
-
-// ✅ DAILY: 1 point par jour (moyennes)
-app.get("/stats/daily", (req, res) => {
-  const { playerId, game = "all", days = 30 } = req.query;
-
-  if (!playerId) return res.status(400).json({ error: "playerId missing" });
-
-  let sql = `
-    SELECT
-      DATE(created_at) AS day,
-      COUNT(*) AS sessions,
-      AVG(score / NULLIF(total,0)) AS avgAccuracy,
-      AVG(score) AS avgScore
-    FROM sessions
-    WHERE player_id = ?
-      AND created_at >= NOW() - INTERVAL ? DAY
-  `;
-
-  const params = [playerId, Number(days)];
-
-  if (game !== "all") {
-    sql += " AND game = ?";
-    params.push(game);
-  }
-
-  sql += " GROUP BY day ORDER BY day";
-
-  db.query(sql, params, (err, rows) => {
-    if (err) {
-      console.log("SQL ERROR:", err);
-      return res.status(500).send("Error");
-    }
-    res.json(rows);
-  });
-});
-
-
 
 app.get("/stats/sessions", (req, res) => {
   const { playerId, game = "all", limit = 60 } = req.query;
-
   if (!playerId) return res.status(400).json({ error: "playerId missing" });
 
   let sql = `
@@ -245,7 +187,6 @@ app.get("/stats/sessions", (req, res) => {
     FROM sessions
     WHERE player_id = ?
   `;
-
   const params = [playerId];
 
   if (game !== "all") {
@@ -253,18 +194,11 @@ app.get("/stats/sessions", (req, res) => {
     params.push(game);
   }
 
-  sql += `
-    ORDER BY created_at ASC
-    LIMIT ?
-  `;
-
+  sql += " ORDER BY created_at ASC LIMIT ?";
   params.push(Math.min(Number(limit) || 60, 200));
 
   db.query(sql, params, (err, rows) => {
-    if (err) {
-      console.log("SQL ERROR:", err);
-      return res.status(500).send("Error");
-    }
+    if (err) return res.status(500).send("Error");
 
     const out = (rows || []).map((r, i) => ({
       idx: i + 1,
@@ -278,27 +212,6 @@ app.get("/stats/sessions", (req, res) => {
     res.json(out);
   });
 });
-app.get("/leaderboard/vocab", (req, res) => {
-  const sql = `
-    SELECT
-      u.username,
-      MAX(s.score) AS bestScore,
-      AVG(s.score / NULLIF(s.total,0)) AS avgAccuracy
-    FROM sessions s
-    JOIN users u ON u.id = s.player_id
-    WHERE s.game = 'vocab'
-    GROUP BY s.player_id
-    ORDER BY bestScore DESC
-    LIMIT 10
-  `;
-
-  db.query(sql, (err, rows) => {
-    if (err) return res.status(500).json({ error: "DB error" });
-    res.json(rows);
-  });
-});
-
-
 
 app.listen(3001, () => {
   console.log("Server running on http://localhost:3001");

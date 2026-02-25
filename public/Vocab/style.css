@@ -1,18 +1,26 @@
-/* ===== NO SCROLL / FULLSCREEN RESET ===== */
+/* =========================================================
+   VOCAB (vg-*) — FULLSCREEN / NO SCROLL / GLASS + GRID + GLOW
+========================================================= */
+
+/* ===== RESET / NO SCROLL ===== */
 html, body{
   height: 100%;
   margin: 0;
-  overflow: hidden; 
-  scrollbar-width: none;      
- -ms-overflow-style: none; 
+  padding: 0;
+  overflow: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+body::-webkit-scrollbar{ width:0; height:0; }
 
-body::-webkit-scrollbar{
-  width: 0;
-  height: 0;
+*,
+*::before,
+*::after{ box-sizing: border-box; }
+
+img, video, canvas, svg{
+  max-width: 100%;
+  height: auto;
 }
-
-*{ box-sizing: border-box; }
 
 /* ===== THEME ===== */
 :root{
@@ -22,6 +30,10 @@ body::-webkit-scrollbar{
   --bg1: #0b1024;
   --bg2: #0f1732;
   --bg3: #0c132b;
+
+  --violet: #8b5cf6;
+  --pink: #ec4899;
+  --cyan: #22d3ee;
 
   --panelA: rgba(255,255,255,0.13);
   --panelB: rgba(255,255,255,0.08);
@@ -35,14 +47,16 @@ body::-webkit-scrollbar{
 body{
   font-family: Inter, system-ui, Arial, sans-serif;
   color: var(--text);
+  background: #0a0f1f;
 }
 
-/* ===== PAGE + GRID BACKGROUND ===== */
+/* ===== PAGE BACKGROUND (FULLSCREEN) ===== */
 .vg-page{
-  height: 100vh;            /* ✅ plein écran */
-  padding: 28px;
+  height: 100vh;
+  width: 100%;
+  padding: 28px 40px;   /* ✅ plus large */
   position: relative;
-  overflow: hidden;         /* ✅ bloque aussi dans le wrapper */
+  overflow: hidden;
 
   background:
     radial-gradient(1100px 750px at 18% 12%, rgba(139,92,246,0.40), transparent 62%),
@@ -51,32 +65,60 @@ body{
     linear-gradient(180deg, var(--bg1), var(--bg2) 60%, var(--bg3));
 }
 
+/* grid overlay animé */
 .vg-page::before{
   content:"";
   position:absolute;
   inset:0;
+  pointer-events:none;
   background:
     linear-gradient(to right, var(--grid) 1.5px, transparent 1.5px),
-    linear-gradient(to bottom, var(--grid) 1.5px, transparent 1.5px);
-  background-size: 64px 64px;
-  opacity: 0.55;
+    linear-gradient(to bottom, var(--grid) 1.5px, transparent 1.5px),
+    radial-gradient(circle at 50% 35%, rgba(255,255,255,0.10), transparent 58%);
+  background-size: 64px 64px, 64px 64px, 100% 100%;
+  opacity: 0.7;
+  animation: vgGridMove 40s linear infinite;
+}
+
+@keyframes vgGridMove{
+  from{ background-position: 0 0, 0 0, center; }
+  to{ background-position: 64px 64px, 64px 64px, center; }
+}
+
+/* glow overlay */
+.vg-page::after{
+  content:"";
+  position:absolute;
+  inset:-25%;
   pointer-events:none;
+  background:
+    radial-gradient(circle at 25% 25%, rgba(139,92,246,0.18), transparent 60%),
+    radial-gradient(circle at 75% 70%, rgba(236,72,153,0.13), transparent 60%),
+    radial-gradient(circle at 55% 90%, rgba(34,211,238,0.11), transparent 65%);
+  filter: blur(44px);
+  animation: vgFloat 12s ease-in-out infinite alternate;
+}
+
+@keyframes vgFloat{
+  from{ transform: translateY(-18px); }
+  to{ transform: translateY(18px); }
 }
 
 /* ===== LAYOUT ===== */
 .vg-shell{
   position: relative;
   z-index: 1;
-  width: min(1220px, 100%);
-  margin: 0 auto;
+
+  width: 100%;     /* ✅ plus de min(1220px, 100%) */
+  margin: 0;       /* ✅ plus de centrage */
 
   display: grid;
-  grid-template-columns: 340px 1fr;
-  gap: 16px;
+  grid-template-columns: 360px 1fr; /* ✅ sidebar plus large */
+  gap: 18px;
 
-  height: calc(100vh - 56px); /* 2*padding (28+28) */
-  min-height: 0;              /* ✅ important */
-  min-width: 0;               /* ✅ important */
+  height: calc(100vh - 56px); /* 28+28 */
+  min-height: 0;
+  min-width: 0;
 }
 
 .vg-side, .vg-main{
@@ -86,9 +128,9 @@ body{
   box-shadow: var(--shadow);
   backdrop-filter: blur(14px);
 
-  min-height: 0; /* ✅ important */
-  min-width: 0;  /* ✅ important */
-  overflow: hidden; /* ✅ empêche scroll interne */
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 /* ===== SIDEBAR ===== */
@@ -112,19 +154,34 @@ body{
   text-align:center;
   width: 100%;
   border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(255,255,255,0.06);
-  color: var(--text);
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.92);
   border-radius: 16px;
   padding: 10px 12px;
   font-weight: 900;
+  cursor: pointer;
+  transition: .18s ease;
+}
+.vg-backBtn:hover{
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.11);
 }
 
-.vg-title{ margin-top: 12px; font-weight: 1100; font-size: 18px; }
-.vg-sub{ margin-top: 4px; color: var(--muted); font-weight: 700; font-size: 12px; }
+.vg-title{
+  margin-top: 12px;
+  font-weight: 1100;
+  font-size: 18px;
+}
+.vg-sub{
+  margin-top: 4px;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 12px;
+}
 
 .vg-pill{
   margin-top: 10px;
-  display:inline-block;
+  display:inline-flex;
   padding: 8px 10px;
   border-radius: 999px;
   font-size: 12px;
@@ -133,6 +190,7 @@ body{
   background: linear-gradient(135deg, rgba(34,211,238,0.14), rgba(139,92,246,0.14));
 }
 
+/* setup */
 .vg-setup{
   border-radius: 18px;
   border: 1px solid rgba(255,255,255,0.12);
@@ -143,12 +201,15 @@ body{
   min-height: 0;
 }
 
+.vg-field{
+  display: grid;
+  gap: 8px;
+}
+
 .vg-field label{
-  display:block;
   font-weight: 900;
   font-size: 12px;
   color: rgba(255,255,255,0.82);
-  margin-bottom: 6px;
 }
 
 .vg-select{
@@ -156,11 +217,16 @@ body{
   appearance:none;
   outline:none;
   font-weight:900;
-  border-radius: 14px;
+  border-radius: 16px;
   padding: 12px 12px;
-  border: 1px solid rgba(255,255,255,0.14);
+  border: 1px solid rgba(255,255,255,0.16);
   background: rgba(10,15,31,0.55);
-  color: rgba(255,255,255,0.92);
+  color: rgba(255,255,255,0.94);
+  transition: .18s ease;
+}
+.vg-select:focus{
+  border-color: rgba(34,211,238,0.60);
+  box-shadow: 0 0 0 4px rgba(34,211,238,0.16);
 }
 
 .vg-hint{
@@ -176,6 +242,7 @@ body{
   display:grid;
   gap: 14px;
   align-content: start;
+  min-width: 0;
 }
 
 .vg-topRow{
@@ -183,9 +250,13 @@ body{
   justify-content: space-between;
   align-items:center;
   gap: 12px;
+  min-width: 0;
 }
 
-.vg-mainTitle{ font-weight: 1100; font-size: 18px; }
+.vg-mainTitle{
+  font-weight: 1100;
+  font-size: 18px;
+}
 
 .vg-chip{
   padding: 8px 10px;
@@ -202,6 +273,7 @@ body{
   color: var(--muted);
   font-weight: 900;
   font-size: 13px;
+  gap: 12px;
 }
 
 .vg-qBox{
@@ -209,6 +281,7 @@ body{
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.06);
   padding: 14px;
+  min-width: 0;
 }
 
 .vg-qLabel{
@@ -224,9 +297,10 @@ body{
   font-size: 24px;
   font-weight: 1100;
   letter-spacing: -0.3px;
+  word-break: break-word;
 }
 
-/* réponses : si tu génères beaucoup de boutons, ça doit rester dans l'écran */
+/* réponses */
 .vg-answers{
   display: grid;
   gap: 10px;
@@ -239,22 +313,33 @@ body{
   width: 100%;
   border: 1px solid rgba(255,255,255,0.14);
   background: rgba(255,255,255,0.07);
-  color: var(--text);
+  color: rgba(255,255,255,0.92);
   border-radius: 16px;
   padding: 12px;
   font-weight: 1000;
   cursor:pointer;
   transition: .18s ease;
 }
-.vg-btn:hover{ transform: translateY(-2px); background: rgba(255,255,255,0.11); }
-.vg-btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
+.vg-btn:hover{
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.11);
+}
+.vg-btn:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+  transform:none;
+}
 
 .vg-btn.primary{
-  background: linear-gradient(135deg, rgba(139,92,246,0.55), rgba(236,72,153,0.50));
-  border: none;
+  color: #0b0b16;
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  border-color: rgba(255,255,255,0.20);
+  box-shadow: 0 12px 30px rgba(139,92,246,0.18);
 }
+
 .vg-btn.finish{
-  background: linear-gradient(135deg, rgba(236,72,153,0.25), rgba(139,92,246,0.25));
+  background: linear-gradient(135deg, rgba(34,211,238,0.18), rgba(139,92,246,0.18));
+  border-color: rgba(34,211,238,0.28);
 }
 
 .vg-msg{
@@ -263,22 +348,29 @@ body{
   border: 1px solid rgba(255,255,255,0.14);
   background: rgba(0,0,0,0.12);
   font-weight: 900;
+  min-width: 0;
 }
 
-.vg-actions{ display:flex; justify-content:flex-end; }
+.vg-actions{
+  display:flex;
+  justify-content:flex-end;
+}
 
-/* responsive */
+/* ===== RESPONSIVE ===== */
 @media (max-width: 1100px){
+  .vg-page{ padding: 18px; }
+
   .vg-shell{
     grid-template-columns: 1fr;
-    height: calc(100vh - 56px);
-    min-height: 0;
+    height: calc(100vh - 36px);
+    gap: 16px;
   }
-  .vg-page{
-    height: 100vh;
-    overflow: hidden;
-  }
-  html, body{
-    overflow: hidden;
+}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .vg-page::before,
+  .vg-page::after{
+    animation: none !important;
   }
 }

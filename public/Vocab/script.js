@@ -329,20 +329,16 @@ function endGame() {
 ========================= */
 
 async function saveSession() {
-  const playerId = getPlayerId();
   const durationSec = startAt ? Math.floor((Date.now() - startAt) / 1000) : 0;
-  const token = localStorage.getItem("token"); // si tu utilises JWT
+  const token = localStorage.getItem("token");
 
-  // Si ton backend actuel attend playerId: OK on l’envoie.
-  // Si tu as sécurisé /save avec JWT, token sera utilisé.
   await fetch("http://localhost:3001/save", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      ...(token ? { Authorization: "Bearer " + token } : {}),
+      Authorization: "Bearer " + token,
     },
     body: JSON.stringify({
-      playerId,
       game: "vocab",
       score,
       total: pool.length,
