@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 
 
 import Math from "./games/math/MathGame";
+import Vocab from "./games/vocab/VocabGame";
 
 export default function App() {
   return (
@@ -17,6 +18,8 @@ export default function App() {
 
 
     <Route path="/math" element={<Math/>}/>
+    <Route path= "/vocab" element={<Vocab/>}/>
+
 
 
     </Routes>
