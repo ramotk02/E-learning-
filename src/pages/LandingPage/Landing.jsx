@@ -1,6 +1,7 @@
 import "./Landing.css";
 import { Link } from "react-router-dom";
-import bild1 from "./Bild1.png";
+
+const bild1 = new URL("./Bild1.png", import.meta.url).href;
 
 export default function Landing() {
   return (
@@ -8,7 +9,9 @@ export default function Landing() {
       <div className="lp-shell">
         <header className="lp-header">
           <div className="lp-brand">
-            <div className="lp-logo" aria-hidden="true">e</div>
+            <div className="lp-logo" aria-hidden="true">
+              e
+            </div>
             <div className="lp-brandText">
               <div className="lp-brandName">Edu-Exos</div>
               <div className="lp-brandSub">learn smart • stay consistent</div>
@@ -16,8 +19,12 @@ export default function Landing() {
           </div>
 
           <nav className="lp-nav">
-            <Link className="lp-link" to="/Login">Login</Link>
-            <Link className="lp-link lp-linkGhost" to="/register">Register</Link>
+            <Link className="lp-link" to="/login">
+              Login
+            </Link>
+            <Link className="lp-link lp-linkGhost" to="/register">
+              Register
+            </Link>
           </nav>
         </header>
 
@@ -30,8 +37,8 @@ export default function Landing() {
             </h1>
 
             <p className="lp-text">
-              Kurze Übungen in Mathe, Vokabeln und Konjugation.
-              Mit Auto-Level, Timer und Statistiken — ohne unnötigen Stress.
+              Kurze Übungen in Mathe, Vokabeln und Konjugation. Mit Auto-Level,
+              Timer und Statistiken — ohne unnötigen Stress.
             </p>
 
             <div className="lp-actions">
@@ -41,7 +48,6 @@ export default function Landing() {
               <Link className="lp-btn lp-btnSecondary" to="/login">
                 Einloggen
               </Link>
-              
             </div>
 
             <div className="lp-features">
@@ -91,11 +97,14 @@ export default function Landing() {
               </div>
 
               <div className="lp-noteText">
-                Starte als Gast oder erstelle ein Konto, damit deine Sessions gespeichert werden.
+                Starte als Gast oder erstelle ein Konto, damit deine Sessions
+                gespeichert werden.
               </div>
 
               <div className="lp-noteActions">
-                <Link className="lp-miniLink" to="/register">Account erstellen →</Link>
+                <Link className="lp-miniLink" to="/register">
+                  Account erstellen →
+                </Link>
               </div>
             </div>
           </section>

@@ -342,6 +342,8 @@ body{
     radial-gradient(circle at 70% 70%, rgba(236,72,153,0.16), transparent 60%);
   filter: blur(16px);
   pointer-events:none;
+    z-index: 0;
+
 }
 
 .lp-img{
@@ -350,6 +352,8 @@ body{
   object-fit: cover;
   display:block;
   transform: scale(1.02);
+  position: relative;
+  z-index: 1;
 }
 
 .lp-note{
