@@ -1,21 +1,21 @@
-# 📚 E-Learning Plattform
+#  E-Learning Plattform
 
 Eine moderne **Full-Stack E-Learning Webanwendung** mit interaktiven Lernspielen, Benutzerverwaltung und statistischer Auswertung.
 
 ---
 
-## 🚀 Projektübersicht
+##  Projektübersicht
 
 Diese Plattform ermöglicht:
 
-- 🔐 Registrierung und Login (JWT-Authentifizierung)
-- 🎮 Interaktive Lernspiele (Mathematik, Wortschatz, Konjugation)
-- 💾 Speicherung von Spielergebnissen
-- 📊 Anzeige von Statistiken im Dashboard
+-  Registrierung und Login (JWT-Authentifizierung)
+-  Interaktive Lernspiele (Mathematik, Wortschatz, Konjugation)
+-  Speicherung von Spielergebnissen
+-  Anzeige von Statistiken im Dashboard
 
 ---
 
-## 🛠️ Technologien
+##  Technologien
 
 ### Frontend
 - React (Vite)
@@ -32,7 +32,7 @@ Diese Plattform ermöglicht:
 
 ---
 
-## 📂 Projektstruktur
+## Projektstruktur
 
 E-learning-/
 │
@@ -47,7 +47,7 @@ E-learning-/
 
 ---
 
-## ⚙️ Installation & Start
+##  Installation & Start
 
 ### 1. Repository klonen
 
