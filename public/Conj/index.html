@@ -1,44 +1,124 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deutsch LernKonjugator</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deutsch LernKonjugator</title>
+
+  <link rel="stylesheet" href="./style.css" />
+  <script defer src="./script.js"></script>
 </head>
+
 <body>
+  <div class="mg-page">
+    <div class="mg-shell">
 
-<h1>Deutsch LernKonjugator</h1>
+      <!-- ===== SIDEBAR ===== -->
+      <aside class="mg-side">
+        <div class="mg-brand">
+          <button class="mg-backBtn" id="backBtn" type="button">← Zurück</button>
 
-<input type="text" id="verbe" placeholder="Verb eingeben">
-<br><br>
+          <div class="mg-title">Conjugation Setup</div>
+          <div class="mg-sub">Deutsch Trainer • Exam Mode</div>
+          <div class="mg-pill" id="playerInfo">Player: …</div>
+        </div>
 
-<select id="temps">
-    <option value="present">Präsens</option>
-    <option value="passe">Vergangenheit</option>
-</select>
+        <div class="mg-setup">
+          <div class="mg-field">
+            <label>Fragen</label>
+            <select id="countSelect" class="mg-select">
+              <option value="5">5</option>
+              <option value="10" selected>10</option>
+              <option value="15">15</option>
+            </select>
+          </div>
 
-<br><br>
-<button onclick="conjuguer()">Konjugieren</button>
+          <div class="mg-field">
+            <label>Start-Level</label>
+            <select id="levelSelect" class="mg-select">
+              <option value="easy" selected>easy</option>
+              <option value="medium">medium</option>
+              <option value="hard">hard</option>
+            </select>
+          </div>
 
-<div id="resultat"></div>
+          <div class="mg-field">
+            <label>Timer / Frage</label>
+            <select id="timeSelect" class="mg-select">
+              <option value="10">10 sec</option>
+              <option value="15" selected>15 sec</option>
+              <option value="20">20 sec</option>
+            </select>
+          </div>
 
-<hr>
+          <div class="mg-field">
+            <label>Zeitform</label>
+            <select id="tenseSelect" class="mg-select">
+              <option value="present" selected>Präsens</option>
+              <option value="passe">Perfekt</option>
+            </select>
+          </div>
 
-<h2>Übung</h2>
-<p id="question"></p>
+          <div class="mg-hint" id="tipText">
+            Tipp: Du hast <b>15s</b> pro Frage • Ziel: <b>10</b> Fragen
+          </div>
 
-<input type="text" id="reponse">
-<button onclick="verifier()">Antwort prüfen</button>
+          <button id="startBtn" class="mg-btn primary" type="button">Start</button>
+        </div>
+      </aside>
 
-<p id="score">Punkte: 0</p>
-<button onclick="startExam()">Start Exam</button>
+      <!-- ===== MAIN ===== -->
+      <main class="mg-main">
+        <div class="mg-topRow">
+          <div class="mg-title" id="mainTitle">Bereit?</div>
+          <div class="mg-chip">Timer • Level • Punkte</div>
+        </div>
 
-<h2 id="examInfo"></h2>
-<p id="timer">Zeit: 15s</p>
+        <div class="mg-stats">
+          <div class="mg-stat">
+            <span>Zeit</span>
+            <b id="timer">15</b>
+          </div>
 
+          <div class="mg-stat">
+            <span>Punkte</span>
+            <b id="score">0</b>
+          </div>
 
+          <div class="mg-stat">
+            <span>Fortschritt</span>
+            <b id="progress">0 / 0</b>
+          </div>
 
-<script src="script.js"></script>
+          <div class="mg-stat">
+            <span>Level</span>
+            <b id="levelDisplay">easy</b>
+          </div>
+        </div>
+
+        <div class="mg-qBox">
+          <div class="mg-qLabel">INFO</div>
+          <div class="mg-qText" id="question">Starte das Spiel links – viel Erfolg!</div>
+        </div>
+
+        <div class="mg-answerRow">
+          <input
+            type="text"
+            id="answerInput"
+            class="mg-input"
+            placeholder="Antwort eingeben..."
+            autocomplete="off"
+            disabled
+          />
+
+          <button id="checkBtn" class="mg-btn" type="button" disabled>Prüfen</button>
+          <button id="saveBtn" class="mg-btn finish" type="button" disabled>Finish (Save)</button>
+        </div>
+
+        <div class="mg-msg" id="msg" style="display:none;"></div>
+      </main>
+
+    </div>
+  </div>
 </body>
 </html>

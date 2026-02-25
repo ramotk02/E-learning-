@@ -1,265 +1,390 @@
-let score = 0;
-let bonneReponse = "";
-let timer;
-let tempsRestant = 15;
+/* =========================
+   DATA
+========================= */
 
-let examMode = false;
-let questionCount = 0;
-const maxQuestions = 10;
-
-let currentVerb = "";
-let currentPronoun = 0;
-
-const pronouns = ["ich","du","er/sie/es","wir","ihr","sie"];
+const pronouns = ["ich", "du", "er/sie/es", "wir", "ihr", "sie"];
 
 const verbes = {
-
-gehen: {
-    type: "irregulier",
-    present: ["gehe","gehst","geht","gehen","geht","gehen"],
+  gehen: {
+    level: "easy", type: "irregulier",
+    present: ["gehe", "gehst", "geht", "gehen", "geht", "gehen"],
     passe: "gegangen"
-},
-
-machen: {
-    type: "regulier",
-    present: ["mache","machst","macht","machen","macht","machen"],
+  },
+  machen: {
+    level: "easy", type: "regulier",
+    present: ["mache", "machst", "macht", "machen", "macht", "machen"],
     passe: "gemacht"
-},
+  },
+  lernen: {
+    level: "easy", type: "regulier",
+    present: ["lerne", "lernst", "lernt", "lernen", "lernt", "lernen"],
+    passe: "gelernt"
+  },
+  spielen: {
+    level: "easy", type: "regulier",
+    present: ["spiele", "spielst", "spielt", "spielen", "spielt", "spielen"],
+    passe: "gespielt"
+  },
+  arbeiten: {
+    level: "easy", type: "regulier",
+    present: ["arbeite", "arbeitest", "arbeitet", "arbeiten", "arbeitet", "arbeiten"],
+    passe: "gearbeitet"
+  },
 
-sein: {
-    type: "irregulier",
-    present: ["bin","bist","ist","sind","seid","sind"],
+  sein: {
+    level: "medium", type: "irregulier",
+    present: ["bin", "bist", "ist", "sind", "seid", "sind"],
     passe: "gewesen"
-},
+  },
+  haben: {
+    level: "medium", type: "irregulier",
+    present: ["habe", "hast", "hat", "haben", "habt", "haben"],
+    passe: "gehabt"
+  },
+  essen: {
+    level: "medium", type: "irregulier",
+    present: ["esse", "isst", "isst", "essen", "esst", "essen"],
+    passe: "gegessen"
+  },
+  fahren: {
+    level: "medium", type: "irregulier",
+    present: ["fahre", "fährst", "fährt", "fahren", "fahrt", "fahren"],
+    passe: "gefahren"
+  },
+  sehen: {
+    level: "medium", type: "irregulier",
+    present: ["sehe", "siehst", "sieht", "sehen", "seht", "sehen"],
+    passe: "gesehen"
+  },
 
-lernen: {
-    type:"regulier",
-    present:["lerne","lernst","lernt","lernen","lernt","lernen"],
-    passe:"gelernt"
-},
-
-spielen: {
-    type:"regulier",
-    present:["spiele","spielst","spielt","spielen","spielt","spielen"],
-    passe:"gespielt"
-},
-
-arbeiten: {
-    type:"regulier",
-    present:["arbeite","arbeitest","arbeitet","arbeiten","arbeitet","arbeiten"],
-    passe:"gearbeitet"
-},
-
-essen: {
-    type:"irregulier",
-    present:["esse","isst","isst","essen","esst","essen"],
-    passe:"gegessen"
-},
-
-fahren: {
-    type:"irregulier",
-    present:["fahre","fährst","fährt","fahren","fahrt","fahren"],
-    passe:"gefahren"
-},
-
-sehen: {
-    type:"irregulier",
-    present:["sehe","siehst","sieht","sehen","seht","sehen"],
-    passe:"gesehen"
-}
-
+  nehmen: {
+    level: "hard", type: "irregulier",
+    present: ["nehme", "nimmst", "nimmt", "nehmen", "nehmt", "nehmen"],
+    passe: "genommen"
+  },
+  sprechen: {
+    level: "hard", type: "irregulier",
+    present: ["spreche", "sprichst", "spricht", "sprechen", "sprecht", "sprechen"],
+    passe: "gesprochen"
+  },
+  geben: {
+    level: "hard", type: "irregulier",
+    present: ["gebe", "gibst", "gibt", "geben", "gebt", "geben"],
+    passe: "gegeben"
+  }
 };
 
+/* =========================
+   DOM
+========================= */
 
-// CONJUGAISON
-function conjuguer() {
+const elTimer = document.getElementById("timer");
+const elScore = document.getElementById("score");
+const elProgress = document.getElementById("progress");
+const elLevelDisplay = document.getElementById("levelDisplay");
+const elQuestion = document.getElementById("question");
+const elMsg = document.getElementById("msg");
 
-    const verbe = document.getElementById("verbe").value.toLowerCase();
-    const temps = document.getElementById("temps").value;
-    const res = document.getElementById("resultat");
+const elAnswer = document.getElementById("answerInput");
+const elCheck = document.getElementById("checkBtn");
+const elSave = document.getElementById("saveBtn");
 
-    if (!verbes[verbe]) {
-        res.innerHTML = "Verb nicht gefunden";
-        return;
+const selCount = document.getElementById("countSelect");
+const selLevel = document.getElementById("levelSelect");
+const selTime = document.getElementById("timeSelect");
+const selTense = document.getElementById("tenseSelect");
+const elTip = document.getElementById("tipText");
+
+/* =========================
+   STATE
+========================= */
+
+let maxQuestions = 10;
+let timePerQ = 15;
+let selectedLevel = "easy";
+let selectedTense = "present";
+
+let score = 0;
+let index = 0;
+let time = 15;
+let timer = null;
+
+let questions = [];
+let finished = false;
+let startAt = null;
+
+/* =========================
+   HELPERS
+========================= */
+
+function shuffle(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function showMsg(text) {
+  elMsg.style.display = "block";
+  elMsg.innerText = text;
+}
+
+function clearMsg() {
+  elMsg.style.display = "none";
+  elMsg.innerText = "";
+}
+
+function stopTimer() {
+  if (timer) clearInterval(timer);
+  timer = null;
+}
+
+function setRunningUI(running) {
+  elAnswer.disabled = !running;
+  elCheck.disabled = !running;
+  if (!running) elAnswer.value = "";
+}
+
+function getPlayerId() {
+  // si tu as déjà un user dans localStorage
+  const u = localStorage.getItem("user");
+  if (u) {
+    try { return JSON.parse(u).id; } catch {}
+  }
+
+  let id = localStorage.getItem("player_id");
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem("player_id", id);
+  }
+  return id;
+}
+
+function updateTip() {
+  const q = Number(selCount.value || 10);
+  const t = Number(selTime.value || 15);
+  elTip.innerHTML = `Tipp: Du hast <b>${t}s</b> pro Frage • Ziel: <b>${q}</b> Fragen`;
+}
+
+/* =========================
+   GENERATE EXAM
+========================= */
+
+function generateExam() {
+  const filtered = Object.keys(verbes).filter(v => verbes[v].level === selectedLevel);
+
+  if (filtered.length === 0) {
+    questions = [];
+    return;
+  }
+
+  const shuffled = shuffle(filtered);
+
+  questions = shuffled
+    .slice(0, Math.min(maxQuestions, shuffled.length))
+    .map(v => {
+      const pIndex = Math.floor(Math.random() * 6);
+      return {
+        verb: v,
+        pronoun: pronouns[pIndex],
+        answer: selectedTense === "present"
+          ? verbes[v].present[pIndex]
+          : verbes[v].passe
+      };
+    });
+}
+
+/* =========================
+   START
+========================= */
+
+function startExam() {
+  selectedLevel = selLevel.value;
+  selectedTense = selTense.value;
+  maxQuestions = Number(selCount.value);
+  timePerQ = Number(selTime.value);
+
+  score = 0;
+  index = 0;
+  time = timePerQ;
+  finished = false;
+  startAt = Date.now();
+
+  elSave.disabled = true;
+  clearMsg();
+
+  elLevelDisplay.innerText = selectedLevel;
+  elScore.innerText = String(score);
+  elTimer.innerText = String(timePerQ);
+
+  generateExam();
+
+  if (questions.length === 0) {
+    elQuestion.innerText = "Keine Verben gefunden für dieses Level.";
+    elProgress.innerText = "0 / 0";
+    setRunningUI(false);
+    return;
+  }
+
+  setRunningUI(true);
+  nextQuestion();
+}
+
+/* =========================
+   QUESTION
+========================= */
+
+function nextQuestion() {
+  if (finished) return;
+
+  if (index >= questions.length) {
+    endExam();
+    return;
+  }
+
+  const q = questions[index];
+
+  elQuestion.innerText = `Konjugiere (${selectedTense}): ${q.pronoun} ${q.verb}`;
+  elProgress.innerText = `${index + 1} / ${questions.length}`;
+  elScore.innerText = String(score);
+
+  elAnswer.value = "";
+  clearMsg();
+
+  startTimer();
+}
+
+/* =========================
+   TIMER
+========================= */
+
+function startTimer() {
+  stopTimer();
+  time = timePerQ;
+  elTimer.innerText = String(time);
+
+  timer = setInterval(() => {
+    if (finished) return;
+
+    time--;
+    elTimer.innerText = String(time);
+
+    if (time <= 0) {
+      stopTimer();
+      showMsg("⏰ Zeit abgelaufen!");
+      index++;
+      setTimeout(() => {
+        clearMsg();
+        nextQuestion();
+      }, 600);
     }
-
-    if (temps === "present") {
-
-        res.innerHTML = `
-        Typ: ${verbes[verbe].type}<br>
-        ich ${verbes[verbe].present[0]}<br>
-        du ${verbes[verbe].present[1]}<br>
-        er/sie/es ${verbes[verbe].present[2]}<br>
-        wir ${verbes[verbe].present[3]}<br>
-        ihr ${verbes[verbe].present[4]}<br>
-        sie ${verbes[verbe].present[5]}
-        `;
-
-    } else {
-
-        res.innerHTML =
-        `Vergangenheit: ${verbes[verbe].passe}`;
-    }
-
-    genererExercice(verbe);
+  }, 1000);
 }
 
+/* =========================
+   CHECK
+========================= */
 
-// GENERER EXERCICE
-function genererExercice(verbe) {
+function checkAnswer() {
+  if (finished) return;
+  if (index >= questions.length) return;
 
-    currentVerb = verbe;
-    currentPronoun = 0;
+  const input = elAnswer.value.trim().toLowerCase();
+  const correct = String(questions[index].answer).toLowerCase();
 
-    bonneReponse = verbes[verbe].present[currentPronoun];
+  stopTimer();
 
-    document.getElementById("question").innerHTML =
-    `Konjugiere: ${pronouns[currentPronoun]} ${verbe}`;
+  if (input === correct) {
+    score++;
+    elScore.innerText = String(score);
+    showMsg("✅ Richtig!");
+  } else {
+    showMsg("❌ Falsch! Antwort: " + questions[index].answer);
+  }
 
-    startTimer(verbe);
-}
+  index++;
 
-
-// TIMER
-function startTimer(verbe){
-
-    clearInterval(timer);
-    tempsRestant = 15;
-
-    document.getElementById("timer").innerText =
-    "Zeit: " + tempsRestant + "s";
-
-    timer = setInterval(() => {
-
-        tempsRestant--;
-
-        document.getElementById("timer").innerText =
-        "Zeit: " + tempsRestant + "s";
-
-        if(tempsRestant === 0){
-
-            clearInterval(timer);
-
-            currentPronoun++;
-
-            if(currentPronoun >= 6){
-
-                if(examMode){
-                    nextQuestion();
-                }else{
-                    genererExercice(verbe);
-                }
-
-            }else{
-
-                bonneReponse =
-                verbes[verbe].present[currentPronoun];
-
-                document.getElementById("question").innerHTML =
-                `Konjugiere: ${pronouns[currentPronoun]} ${verbe}`;
-
-                startTimer(verbe);
-            }
-        }
-
-    },1000);
-}
-
-
-// VERIFIER REPONSE
-function verifier() {
-
-    const rep = document.getElementById("reponse")
-    .value.toLowerCase().trim();
-
-    clearInterval(timer);
-
-    if (rep === bonneReponse) {
-
-        score++;
-        alert("Richtig!");
-
-        currentPronoun++;
-
-        if(currentPronoun >= 6){
-
-            if(examMode){
-                nextQuestion();
-            }else{
-                genererExercice(currentVerb);
-            }
-
-        }else{
-
-            bonneReponse =
-            verbes[currentVerb].present[currentPronoun];
-
-            document.getElementById("question").innerHTML =
-            `Konjugiere: ${pronouns[currentPronoun]} ${currentVerb}`;
-
-            startTimer(currentVerb);
-        }
-
-    } else {
-
-        alert("Falsch!");
-        startTimer(currentVerb);
-    }
-
-    document.getElementById("score").innerText =
-    "Punkte: " + score;
-
-    document.getElementById("reponse").value = "";
-}
-
-
-
-// MODE EXAM
-function startExam(){
-
-    examMode = true;
-    score = 0;
-    questionCount = 0;
-
-    document.getElementById("score").innerText = "Punkte: 0";
-
+  setTimeout(() => {
+    clearMsg();
     nextQuestion();
+  }, 700);
 }
 
+/* =========================
+   END
+========================= */
 
-function nextQuestion(){
+function endExam() {
+  finished = true;
+  stopTimer();
 
-    if(questionCount >= maxQuestions){
+  setRunningUI(false);
 
-        clearInterval(timer);
+  elQuestion.innerText = `Exam beendet! Score: ${score}/${questions.length}`;
+  elProgress.innerText = `${questions.length} / ${questions.length}`;
+  elTimer.innerText = "0";
 
-        let message = "";
-
-        if(score >= 8){
-            message = "😎 Excellent!";
-        }
-        else if(score >=5){
-            message = "👍 Gut!";
-        }
-        else{
-            message = "📚 Wiederholen!";
-        }
-
-        document.getElementById("examInfo").innerText =
-        `Exam beendet! Score: ${score}/10 — ${message}`;
-
-        examMode = false;
-        return;
-    }
-
-    questionCount++;
-
-    document.getElementById("examInfo").innerText =
-    `Frage ${questionCount} / 10`;
-
-    const verbList = Object.keys(verbes);
-    const randomVerb =
-    verbList[Math.floor(Math.random()*verbList.length)];
-
-    genererExercice(randomVerb);
+  elSave.disabled = false;
+  showMsg("Sitzung beendet! Klicke auf Finish (Save).");
 }
+
+/* =========================
+   SAVE TO DB
+========================= */
+
+async function saveToDB() {
+  const durationSec = startAt ? Math.floor((Date.now() - startAt) / 1000) : 0;
+
+  await fetch("http://localhost:3001/save", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      playerId: getPlayerId(),
+      game: "conjugation",
+      score: score,
+      total: questions.length,
+      level: selectedLevel,
+      durationSec
+    })
+  });
+}
+
+/* =========================
+   EVENTS / INIT
+========================= */
+
+document.getElementById("startBtn").addEventListener("click", startExam);
+elCheck.addEventListener("click", checkAnswer);
+
+elAnswer.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") checkAnswer();
+});
+
+elSave.addEventListener("click", async () => {
+  elSave.disabled = true;
+  await saveToDB();
+  showMsg("✅ Gespeichert!");
+});
+
+document.getElementById("backBtn").addEventListener("click", () => history.back());
+
+selCount.addEventListener("change", updateTip);
+selTime.addEventListener("change", updateTip);
+
+(function init() {
+  updateTip();
+
+  const pid = getPlayerId();
+  const pill = document.getElementById("playerInfo");
+  pill.innerText = "Player: " + String(pid).slice(0, 8) + "…";
+
+  // état initial
+  elLevelDisplay.innerText = selLevel.value;
+  elTimer.innerText = String(selTime.value || 15);
+  elScore.innerText = "0";
+  elProgress.innerText = "0 / 0";
+
+  setRunningUI(false);
+})();

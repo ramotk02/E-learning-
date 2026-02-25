@@ -68,11 +68,9 @@ export default function Dashboard() {
   const [overall, setOverall] = useState(null);
   const [byGame, setByGame] = useState([]);
 
-  // Chart data (par session)
   const [sessionSeries, setSessionSeries] = useState([]);
   const [dailyGame, setDailyGame] = useState("all");
 
-  // overall + by game
   useEffect(() => {
     fetch(`http://localhost:3001/stats/overall?playerId=${playerId}`)
       .then((r) => r.json())
@@ -85,13 +83,12 @@ export default function Dashboard() {
       .catch(console.log);
   }, [playerId]);
 
-  // sessions chart (par partie)
   useEffect(() => {
     fetch(
       `http://localhost:3001/stats/sessions?playerId=${playerId}&game=${dailyGame}&limit=60`
     )
       .then((r) => r.json())
-      .then((rows) => setSessionSeries(rows || []))
+      .then((rows) => setSessionSeries(Array.isArray(rows) ? rows : []))
       .catch(console.log);
   }, [playerId, dailyGame]);
 
@@ -101,9 +98,11 @@ export default function Dashboard() {
       vocab: { sessions: 0, avgScore: 0, bestScore: 0, avgAccuracy: 0 },
       conjugation: { sessions: 0, avgScore: 0, bestScore: 0, avgAccuracy: 0 },
     };
+
     for (const row of byGame || []) {
       if (row?.game && base[row.game]) base[row.game] = row;
     }
+
     return [
       { key: "math", label: "Mathe", ...base.math },
       { key: "vocab", label: "Vokabeln", ...base.vocab },
@@ -175,7 +174,10 @@ export default function Dashboard() {
                 <Kpi label="Ø Score" value={n(overall.avgScore).toFixed(2)} />
                 <Kpi label="Best" value={n(overall.bestScore)} />
                 <Kpi label="Genauigkeit" value={pct(overall.avgAccuracy)} />
-                <Kpi label="Ø Dauer" value={`${Math.round(n(overall.avgDuration))}s`} />
+                <Kpi
+                  label="Ø Dauer"
+                  value={`${Math.round(n(overall.avgDuration))}s`}
+                />
               </div>
             )}
           </section>
@@ -237,50 +239,64 @@ export default function Dashboard() {
                   {sessionSeries.length === 0 ? (
                     <div className="db-loading">Noch keine Daten…</div>
                   ) : (
-                    <div className="db-chartInner">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={sessionSeries} margin={{ top: 10, right: 16, left: 0, bottom: 8 }}>
-                          <CartesianGrid stroke="rgba(255,255,255,0.06)" strokeDasharray="3 10" />
+                    <div className="db-chartWrap">
+                      <ResponsiveContainer width="100%" height={280} minWidth={0}>                        <LineChart
+                        data={sessionSeries}
+                        margin={{ top: 10, right: 16, left: 0, bottom: 8 }}
+                      >
+                        <CartesianGrid
+                          stroke="rgba(255,255,255,0.06)"
+                          strokeDasharray="3 10"
+                        />
 
-                          <XAxis
-                            dataKey="idx"
-                            stroke="rgba(255,255,255,0.50)"
-                            tick={{ fill: "rgba(255,255,255,0.75)", fontSize: 12 }}
-                            axisLine={false}
-                            tickLine={false}
-                          />
+                        <XAxis
+                          dataKey="idx"
+                          stroke="rgba(255,255,255,0.50)"
+                          tick={{
+                            fill: "rgba(255,255,255,0.75)",
+                            fontSize: 12,
+                          }}
+                          axisLine={false}
+                          tickLine={false}
+                        />
 
-                          <YAxis
-                            stroke="rgba(255,255,255,0.50)"
-                            tick={{ fill: "rgba(255,255,255,0.75)", fontSize: 12 }}
-                            axisLine={false}
-                            tickLine={false}
-                            domain={[0, "dataMax + 2"]}
-                            width={36}
-                          />
+                        <YAxis
+                          stroke="rgba(255,255,255,0.50)"
+                          tick={{
+                            fill: "rgba(255,255,255,0.75)",
+                            fontSize: 12,
+                          }}
+                          axisLine={false}
+                          tickLine={false}
+                          domain={[0, "dataMax + 2"]}
+                          width={36}
+                        />
 
-                          <Tooltip
-                            cursor={{ stroke: "rgba(255,255,255,0.10)", strokeWidth: 1 }}
-                            contentStyle={{
-                              background: "rgba(10,15,31,0.95)",
-                              border: "1px solid rgba(255,255,255,0.15)",
-                              borderRadius: 14,
-                              color: "white",
-                              boxShadow: "0 20px 60px rgba(0,0,0,0.35)",
-                            }}
-                            labelStyle={{ fontWeight: 900 }}
-                          />
+                        <Tooltip
+                          cursor={{
+                            stroke: "rgba(255,255,255,0.10)",
+                            strokeWidth: 1,
+                          }}
+                          contentStyle={{
+                            background: "rgba(10,15,31,0.95)",
+                            border: "1px solid rgba(255,255,255,0.15)",
+                            borderRadius: 14,
+                            color: "white",
+                            boxShadow: "0 20px 60px rgba(0,0,0,0.35)",
+                          }}
+                          labelStyle={{ fontWeight: 900 }}
+                        />
 
-                          <Line
-                            type="stepAfter"
-                            dataKey="score"
-                            name="Score"
-                            stroke="#20E3FF"
-                            strokeWidth={4}
-                            dot={false}
-                            activeDot={false}
-                          />
-                        </LineChart>
+                        <Line
+                          type="stepAfter"
+                          dataKey="score"
+                          name="Score"
+                          stroke="#20E3FF"
+                          strokeWidth={4}
+                          dot={false}
+                          activeDot={false}
+                        />
+                      </LineChart>
                       </ResponsiveContainer>
                     </div>
                   )}

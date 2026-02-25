@@ -1,15 +1,408 @@
-body {
-    font-family: Arial;
-    text-align: center;
-    background: #f2f2f2;
+/* =========================
+   GLOBAL RESET (NO SCROLL)
+========================= */
+html{
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  scrollbar-gutter: stable both-edges;
 }
 
-input, select, button {
-    padding: 10px;
-    margin: 5px;
+body{
+  height: 100%;
+  margin: 0;
+  padding: 0;
+
+  /* IMPORTANT: si une autre page a mis body en fixed */
+  position: static;
+  overflow: hidden;
+
+  background: #0a0f1f;
+
+  /* hide scrollbars */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+body::-webkit-scrollbar{ width: 0; height: 0; }
+
+*{
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
-#resultat {
-    margin-top: 20px;
-    font-size: 18px;
+/* =========================
+   THEME
+========================= */
+:root{
+  --text: rgba(255,255,255,0.94);
+  --muted: rgba(255,255,255,0.78);
+
+  --bg1: #0b1024;
+  --bg2: #0f1732;
+  --bg3: #0c132b;
+
+  --violet: #8b5cf6;
+  --pink: #ec4899;
+  --cyan: #20e3ff;
+
+  --panelA: rgba(255,255,255,0.13);
+  --panelB: rgba(255,255,255,0.08);
+  --line: rgba(255,255,255,0.14);
+
+  --shadow: 0 22px 80px rgba(0,0,0,0.32);
+  --r: 22px;
+  --grid: rgba(255,255,255,0.14);
+}
+
+/* =========================
+   PAGE BACKGROUND
+========================= */
+.mg-page{
+  height: 100vh;
+  padding: 28px;
+  overflow: hidden;
+
+  font-family: Inter, system-ui, Arial, sans-serif;
+  color: var(--text);
+
+  position: relative;
+
+  background:
+    radial-gradient(1100px 750px at 18% 12%, rgba(139,92,246,0.40), transparent 62%),
+    radial-gradient(900px 650px at 78% 30%, rgba(236,72,153,0.26), transparent 62%),
+    radial-gradient(900px 700px at 50% 88%, rgba(34,211,238,0.18), transparent 68%),
+    linear-gradient(180deg, var(--bg1), var(--bg2) 60%, var(--bg3));
+}
+
+/* grid animée */
+.mg-page::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(to right, var(--grid) 1.5px, transparent 1.5px),
+    linear-gradient(to bottom, var(--grid) 1.5px, transparent 1.5px),
+    radial-gradient(circle at 50% 35%, rgba(255,255,255,0.11), transparent 58%);
+  background-size: 64px 64px, 64px 64px, 100% 100%;
+  opacity: 0.92;
+  pointer-events:none;
+  animation: gridMove 40s linear infinite;
+}
+
+@keyframes gridMove{
+  from { background-position: 0 0, 0 0, center; }
+  to   { background-position: 64px 64px, 64px 64px, center; }
+}
+
+/* glow */
+.mg-page::after{
+  content:"";
+  position:absolute;
+  inset:-25%;
+  background:
+    radial-gradient(circle at 25% 25%, rgba(139,92,246,0.18), transparent 60%),
+    radial-gradient(circle at 75% 70%, rgba(236,72,153,0.13), transparent 60%),
+    radial-gradient(circle at 55% 90%, rgba(34,211,238,0.11), transparent 65%);
+  filter: blur(44px);
+  animation: float 12s ease-in-out infinite alternate;
+  pointer-events:none;
+}
+
+@keyframes float{
+  from { transform: translateY(-18px); }
+  to   { transform: translateY(18px); }
+}
+
+/* =========================
+   LAYOUT
+========================= */
+.mg-shell{
+  position: relative;
+  z-index: 1;
+  width: min(1220px, 100%);
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 16px;
+
+  height: calc(100vh - 56px);
+  min-width: 0;
+  min-height: 0;
+}
+
+.mg-side, .mg-main{
+  border-radius: var(--r);
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--panelA), var(--panelB));
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+.mg-side{
+  padding: 18px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 14px;
+}
+
+.mg-brand{
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  padding: 14px;
+}
+
+.mg-backBtn{
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.92);
+
+  font-weight: 1100;
+  cursor: pointer;
+  transition: .18s ease;
+}
+.mg-backBtn:hover{
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.11);
+}
+
+.mg-title{ font-size: 18px; font-weight: 1100; }
+
+.mg-sub{
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.mg-pill{
+  margin-top: 10px;
+  display:inline-flex;
+  padding: 8px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.mg-setup{
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.mg-field{ display: grid; gap: 8px; }
+.mg-field label{ font-size: 12px; font-weight: 950; }
+
+.mg-select{
+  width: 100%;
+  border-radius: 16px;
+  padding: 12px 44px 12px 12px;
+
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(10,15,31,0.55);
+  color: rgba(255,255,255,0.94);
+
+  font-weight: 1000;
+  outline: none;
+  transition: .18s ease;
+}
+.mg-select:focus{
+  border-color: rgba(32,227,255,0.60);
+  box-shadow: 0 0 0 4px rgba(32,227,255,0.16);
+}
+
+.mg-hint{
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+  font-weight: 700;
+}
+
+/* =========================
+   MAIN
+========================= */
+.mg-main{
+  padding: 18px;
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+
+.mg-topRow{
+  display:flex;
+  justify-content: space-between;
+  align-items:center;
+}
+
+.mg-chip{
+  padding: 8px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: linear-gradient(135deg, rgba(34,211,238,0.12), rgba(139,92,246,0.12));
+  font-size: 12px;
+  font-weight: 1000;
+}
+
+.mg-stats{
+  display:grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  min-width: 0;
+}
+
+.mg-stat{
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.10);
+  padding: 12px;
+  min-width: 0;
+}
+.mg-stat span{
+  display:block;
+  color: var(--muted);
+  font-weight: 900;
+  font-size: 12px;
+}
+.mg-stat b{
+  display:block;
+  margin-top: 6px;
+  font-size: 16px;
+  font-weight: 1100;
+  letter-spacing: -0.2px;
+}
+
+/* question */
+.mg-qBox{
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.12);
+  padding: 14px;
+}
+
+.mg-qLabel{
+  font-weight: 1100;
+  color: rgba(255,255,255,0.82);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
+
+.mg-qText{
+  margin-top: 10px;
+  font-size: 34px;
+  font-weight: 1100;
+  line-height: 1.1;
+}
+
+/* input row */
+.mg-answerRow{
+  display:grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 10px;
+  align-items:center;
+  min-width: 0;
+}
+
+.mg-input{
+  width: 100%;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.94);
+  font-weight: 1000;
+  outline: none;
+}
+.mg-input:focus{
+  border-color: rgba(32,227,255,0.60);
+  box-shadow: 0 0 0 4px rgba(32,227,255,0.16);
+}
+.mg-input:disabled{
+  opacity: .6;
+}
+
+/* buttons */
+.mg-btn{
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.92);
+  font-weight: 1100;
+  border-radius: 16px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: .18s ease;
+}
+.mg-btn:hover{
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.11);
+}
+.mg-btn:disabled{
+  opacity: .6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.mg-btn.primary{
+  color: #0b0b16;
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  box-shadow: 0 12px 30px rgba(139,92,246,0.18);
+  border-color: rgba(255,255,255,0.20);
+}
+
+.mg-btn.finish{
+  background: linear-gradient(135deg, rgba(32,227,255,0.18), rgba(139,92,246,0.18));
+  border-color: rgba(32,227,255,0.28);
+}
+
+/* message */
+.mg-msg{
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.07);
+  padding: 12px;
+  font-weight: 900;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 1100px){
+  .mg-shell{
+    grid-template-columns: 1fr;
+    height: calc(100vh - 56px);
+  }
+
+  .mg-stats{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mg-answerRow{
+    grid-template-columns: 1fr;
+  }
+}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .mg-page::before,
+  .mg-page::after{
+    animation: none !important;
+  }
 }

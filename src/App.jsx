@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 
 import Math from "./games/math/MathGame";
 import Vocab from "./games/vocab/VocabGame";
+import Conj from "./games/conjugation/ConjugaisonGame";
 
 export default function App() {
   return (
@@ -17,9 +18,9 @@ export default function App() {
       <Route path="/dashboard" element={<Dashboard />} />
 
 
-    <Route path="/math" element={<Math/>}/>
-    <Route path= "/vocab" element={<Vocab/>}/>
-
+      <Route path="/math" element={<Math />} />
+      <Route path="/vocab" element={<Vocab />} />
+      <Route path="/conjugation" element={<Conj />} />
 
 
     </Routes>
