@@ -233,7 +233,8 @@ app.get("/stats/daily", (req, res) => {
   });
 });
 
-// ✅ SESSIONS: 1 point par session (pour courbe qui monte/descend à chaque partie)
+
+
 app.get("/stats/sessions", (req, res) => {
   const { playerId, game = "all", limit = 60 } = req.query;
 
@@ -277,7 +278,28 @@ app.get("/stats/sessions", (req, res) => {
     res.json(out);
   });
 });
+app.get("/leaderboard/vocab", (req, res) => {
+  const sql = `
+    SELECT
+      u.username,
+      MAX(s.score) AS bestScore,
+      AVG(s.score / NULLIF(s.total,0)) AS avgAccuracy
+    FROM sessions s
+    JOIN users u ON u.id = s.player_id
+    WHERE s.game = 'vocab'
+    GROUP BY s.player_id
+    ORDER BY bestScore DESC
+    LIMIT 10
+  `;
+
+  db.query(sql, (err, rows) => {
+    if (err) return res.status(500).json({ error: "DB error" });
+    res.json(rows);
+  });
+});
+
+
 
 app.listen(3001, () => {
-  console.log("Server läuft auf Port 3001");
+  console.log("Server running on http://localhost:3001");
 });

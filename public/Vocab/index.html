@@ -1,32 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Vocabulary Quiz</title>
-  <link rel="stylesheet" href="./style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vocabulary Setup</title>
+
+  <link rel="stylesheet" href="/Vocab/style.css" />
+  <script defer src="/Vocab/script.js"></script>
 </head>
+
 <body>
+  <div class="vg-page">
+    <div class="vg-shell">
 
-  <div class="container">
-    <h1>Vocabulary Quiz</h1>
+      <!-- ===== SIDEBAR (SETUP) ===== -->
+      <aside class="vg-side">
+        <div class="vg-brand">
+          <a class="vg-backBtn" href="/dashboard">← Zurück</a>
 
-    <div id="info">
-      <span id="timer">Time: 180</span>
-      <span id="score">Score: 0</span>
+          <div class="vg-title">Vocab Setup</div>
+          <div class="vg-sub">Edu-Exos • Timer & Level</div>
+          <div class="vg-pill" id="playerPill">Player: …</div>
+        </div>
+
+        <div class="vg-setup">
+          <div class="vg-field">
+            <label>Fragen</label>
+            <select class="vg-select" id="countSelect">
+              <option value="5">5</option>
+              <option value="10" selected>10</option>
+              <option value="15">15</option>
+            </select>
+          </div>
+
+          <div class="vg-field">
+            <label>Start-Level</label>
+            <select class="vg-select" id="levelSelect">
+              <option value="easy" selected>easy</option>
+              <option value="medium">medium</option>
+              <option value="hard">hard</option>
+            </select>
+          </div>
+
+          <div class="vg-field">
+            <label>Timer / Frage</label>
+            <select class="vg-select" id="timeSelect">
+              <option value="15" selected>15 sec</option>
+              <option value="10">10 sec</option>
+              <option value="20">20 sec</option>
+            </select>
+          </div>
+
+          <div class="vg-hint">
+            Tipp: Du hast <b id="hintTime">15s</b> pro Frage • Ziel: <b id="hintCount">10</b> Fragen
+          </div>
+
+          <button class="vg-btn primary" id="startBtn" type="button">Start</button>
+        </div>
+      </aside>
+
+      <!-- ===== MAIN (GAME) ===== -->
+      <main class="vg-main">
+        <div class="vg-topRow">
+          <div class="vg-mainTitle" id="mainTitle">Bereit?</div>
+          <div class="vg-chip">Timer • Level • Punkte</div>
+        </div>
+
+        <div class="vg-infoBar">
+          <span id="timer">Time: 15</span>
+          <span id="score">Score: 0</span>
+        </div>
+
+        <div class="vg-qBox">
+          <div class="vg-qLabel">Info</div>
+          <div class="vg-qText" id="quiz">
+            Starte das Spiel links – viel Erfolg!
+          </div>
+        </div>
+
+        <div class="vg-answers" id="answers"></div>
+
+        <div class="vg-msg" id="msg" style="display:none;"></div>
+
+        <div class="vg-actions">
+          <button class="vg-btn finish" id="saveBtn" type="button" disabled>Finish (Save)</button>
+        </div>
+      </main>
+
     </div>
-
-    <div id="level-select">
-      <h2>Select Level</h2>
-      <button onclick="setLevel('easy')">Easy</button>
-      <button onclick="setLevel('medium')">Medium</button>
-      <button onclick="setLevel('hard')">Hard</button>
-    </div>
-
-    <div id="quiz"></div>
-
-    <button id="startBtn">Start Quiz</button>
   </div>
-
-  <script src="script.js"></script>
 </body>
 </html>
