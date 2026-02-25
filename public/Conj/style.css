@@ -1,0 +1,15 @@
+body {
+    font-family: Arial;
+    text-align: center;
+    background: #f2f2f2;
+}
+
+input, select, button {
+    padding: 10px;
+    margin: 5px;
+}
+
+#resultat {
+    margin-top: 20px;
+    font-size: 18px;
+}

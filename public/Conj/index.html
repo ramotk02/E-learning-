@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deutsch LernKonjugator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>Deutsch LernKonjugator</h1>
+
+<input type="text" id="verbe" placeholder="Verb eingeben">
+<br><br>
+
+<select id="temps">
+    <option value="present">Präsens</option>
+    <option value="passe">Vergangenheit</option>
+</select>
+
+<br><br>
+<button onclick="conjuguer()">Konjugieren</button>
+
+<div id="resultat"></div>
+
+<hr>
+
+<h2>Übung</h2>
+<p id="question"></p>
+
+<input type="text" id="reponse">
+<button onclick="verifier()">Antwort prüfen</button>
+
+<p id="score">Punkte: 0</p>
+<button onclick="startExam()">Start Exam</button>
+
+<h2 id="examInfo"></h2>
+<p id="timer">Zeit: 15s</p>
+
+
+
+<script src="script.js"></script>
+</body>
+</html>
