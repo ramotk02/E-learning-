@@ -1,16 +1,56 @@
-# React + Vite
+#  E-Learning Plattform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Eine moderne **Full-Stack E-Learning Webanwendung** mit interaktiven Lernspielen, Benutzerverwaltung und statistischer Auswertung.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+##  Projektübersicht
 
-## React Compiler
+Diese Plattform ermöglicht:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+-  Registrierung und Login (JWT-Authentifizierung)
+-  Interaktive Lernspiele (Mathematik, Wortschatz, Konjugation)
+-  Speicherung von Spielergebnissen
+-  Anzeige von Statistiken im Dashboard
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+##  Technologien
+
+### Frontend
+- React (Vite)
+- React Router
+- Recharts
+
+### Backend
+- Node.js
+- Express
+- MySQL (mysql2)
+- JSON Web Token (JWT)
+- bcrypt
+- CORS
+
+---
+
+## Projektstruktur
+
+E-learning-/
+│
+├── public/
+├── src/
+│   ├── pages/
+│   ├── games/
+│   └── App.jsx
+│
+└── server/
+    └── index.js
+
+---
+
+##  Installation & Start
+
+### 1. Repository klonen
+
+```bash
+git clone https://github.com/ramotk02/E-learning-.git
+cd E-learning-
