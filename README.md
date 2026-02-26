@@ -21,12 +21,11 @@ Dieses Projekt wurde von **Ilyas, Ziad und Omar** entwickelt.
 This project was developed by **Ilyas, Ziad, and Omar**.
 
 ### Aufgabenverteilung / Responsibilities
-- **Ilyas** – Vokabel-Spiel / Vocabulary Game  
+- **Ilyas** – Vokabel-Spiel / Vocabulary Game und Design / UI 
 - **Ziad** – Konjugations-Spiel / Conjugation Game  
 - **Omar** – Mathematik-Spiel + Login & Registrierung (JWT & Datenbank)  
   / Math Game + Login & Registration (JWT & Database)  
-- **Design / UI** – Gemeinsam umgesetzt  
-  / Designed together as a team  
+
 
 Zusätzlich wurde eine **Datenbank integriert**, um Benutzer-Login sowie den **Fortschritt und das Level** jeder Person zu speichern und nachzuverfolgen.  
 
