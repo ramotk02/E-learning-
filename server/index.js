@@ -19,9 +19,7 @@ const db = mysql.createConnection({
 
 db.on("error", (err) => console.log("DB ERROR:", err));
 
-/* =========================
-   AUTH MIDDLEWARE
-========================= */
+
 function auth(req, res, next) {
   const h = req.headers.authorization || "";
   const token = h.startsWith("Bearer ") ? h.slice(7) : null;
@@ -35,9 +33,7 @@ function auth(req, res, next) {
   }
 }
 
-/* =========================
-   AUTH
-========================= */
+
 
 // REGISTER
 app.post("/auth/register", async (req, res) => {
@@ -98,12 +94,9 @@ app.post("/auth/login", (req, res) => {
   );
 });
 
-/* =========================
-   SAVE SESSION (SECURED)
-   player_id = user.id (from token)
-========================= */
+
 app.post("/save", auth, (req, res) => {
-  const userId = req.user.id; // ✅ vrai id utilisateur
+  const userId = req.user.id; 
 
   const { game, score, total, level, durationSec } = req.body;
 
@@ -129,10 +122,7 @@ app.post("/save", auth, (req, res) => {
   );
 });
 
-/* =========================
-   STATS
-   (playerId = user_id)
-========================= */
+
 
 app.get("/stats/overall", (req, res) => {
   const { playerId } = req.query;
@@ -214,5 +204,5 @@ app.get("/stats/sessions", (req, res) => {
 });
 
 app.listen(3001, () => {
-  console.log("Server running on http://localhost:3001");
+  console.log("Server khdam f http://localhost:3001");
 });
