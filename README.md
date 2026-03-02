@@ -1,43 +1,55 @@
-# E-Learning Plattform / E-Learning Platform
+#  E-Learning Plattform / E-Learning Platform
 
-Eine moderne Full-Stack E-Learning Webanwendung mit interaktiven Lernspielen, Benutzerverwaltung und statistischer Auswertung.  
-A modern full-stack e-learning web application with interactive learning games, user management and statistical tracking.
+##  Beschreibung / Description
 
----
+**DE:**  
+Eine moderne **Full-Stack E-Learning Webanwendung** mit interaktiven Lernspielen, Benutzerverwaltung und statistischer Auswertung.  
+Die Plattform kombiniert Lernen und Spielen, um Motivation und Lernerfolg zu steigern.
 
-## Team & Aufgabenverteilung / Team & Responsibilities
-
-Dieses Projekt wurde von **Ilyas, Ziad und Omar** entwickelt.  
-This project was developed by **Ilyas, Ziad and Omar**.
-
-- **Ilyas**: Vokabel-Spiel / Vocabulary game  
-- **Ziad**: Konjugations-Spiel / Conjugation game  
-- **Omar**: Mathematik-Spiel + Login/Registrierung (JWT & Datenbank) / Math game + Login/Registration (JWT & Database)  
-- **Design/UI**: gemeinsam umgesetzt / Designed together as a team  
-
-Zusätzlich wurde eine Datenbank integriert, um Benutzer-Login sowie den Fortschritt und das Level jeder Person zu speichern und nachzuverfolgen.  
-A database was integrated to handle secure login and to store and track each user's progress and level.
+**EN:**  
+A modern **full-stack e-learning web application** with interactive learning games, user management, and statistical tracking.  
+The platform combines learning and gaming to improve motivation and learning outcomes.
 
 ---
 
-## Projektübersicht / Project Overview
+##  Team & Aufgabenverteilung / Team & Responsibilities
 
-Die Plattform ermöglicht:  
-The platform allows:
+**DE:**  
+Dieses Projekt wurde von **Ilyas, Ziad und Omar** entwickelt.
 
-- Registrierung und Login (JWT-Authentifizierung)  
-- Interaktive Lernspiele (Mathematik, Wortschatz, Konjugation)  
-- Speicherung von Spielergebnissen  
-- Anzeige von Statistiken im Dashboard  
+**EN:**  
+This project was developed by **Ilyas, Ziad, and Omar**.
 
-- Registration and login (JWT authentication)  
-- Interactive learning games (Math, Vocabulary, Conjugation)  
-- Saving game results  
-- Displaying statistics in the dashboard  
+### Aufgabenverteilung / Responsibilities
+- **Ilyas** – Vokabel-Spiel / Vocabulary Game und Design / UI +login design
+- **Ziad** – Konjugations-Spiel / Conjugation Game  
+- **Omar** – Mathematik-Spiel + Login & Registrierung (JWT & Datenbank)  
+  / Math Game + Login & Registration (JWT & Database)  
+
+
+Zusätzlich wurde eine **Datenbank integriert**, um Benutzer-Login sowie den **Fortschritt und das Level** jeder Person zu speichern und nachzuverfolgen.  
+
+A **database was integrated** to handle secure login and to store and track each user’s **progress and level**.
 
 ---
 
-## Technologien / Technologies
+##  Projektübersicht / Project Overview
+
+**DE – Die Plattform ermöglicht:**
+- Registrierung und Login (JWT-Authentifizierung)
+- Interaktive Lernspiele (Mathematik, Wortschatz, Konjugation)
+- Speicherung von Spielergebnissen
+- Anzeige von Statistiken im Dashboard
+
+**EN – The platform allows:**
+- Registration and login (JWT authentication)
+- Interactive learning games (Math, Vocabulary, Conjugation)
+- Saving game results
+- Displaying statistics in the dashboard
+
+---
+
+##  Technologien / Technologies
 
 ### Frontend
 - React (Vite)
@@ -47,14 +59,14 @@ The platform allows:
 ### Backend
 - Node.js
 - Express
-- MySQL (mysql2)
+- phpmyadmin
 - JSON Web Token (JWT)
 - bcrypt
 - CORS
 
 ---
 
-## Projektstruktur / Project Structure
+##  Projektstruktur / Project Structure
 
 
 E-learning-/
@@ -72,20 +84,33 @@ E-learning-/
 
 ---
 
-## Installation & Verwendung / Installation & Usage
+##  Installation & Verwendung / Installation & Usage
 
 ### 1. Repository klonen / Clone the repository
-
 ```bash
 git clone https://github.com/ramotk02/E-learning-.git
 cd E-learning-
 2. Datenbank importieren / Import the database
 
+DE:
+
+phpMyAdmin öffnen
+
+Neue Datenbank erstellen (z. B. e-learning)
+
+Auf Import klicken
+
+Datei auswählen: server/e-learning.sql
+
+Import starten
+
+EN:
+
 Open phpMyAdmin
 
-Create a database (for example: e-learning)
+Create a database (e.g. e-learning)
 
-Click on "Import"
+Click on Import
 
 Select the file: server/e-learning.sql
 
@@ -93,10 +118,10 @@ Start the import
 
 3. Abhängigkeiten installieren / Install dependencies
 
-Im Hauptordner des Projekts / In the root project folder:
+Im Hauptordner / In the root project folder:
 
 npm install
-Projekt starten / Run the project
+▶️ Projekt starten / Run the project
 
 Du benötigst zwei Terminals.
 You need two terminals.
@@ -106,13 +131,16 @@ cd server
 node ./index.js
 Terminal 2 – Frontend starten / Start frontend
 npm run dev
+🌐 Lokale Server / Local Servers
 
-Frontend läuft standardmäßig auf:
-The frontend runs by default on:
+Frontend: http://localhost:5173
 
-http://localhost:5173
+Backend: http://localhost:3001
 
-Backend läuft auf:
-The backend runs on:
+ Fazit / Summary
 
-http://localhost:3001
+DE:
+Diese Plattform bietet eine moderne, spielbasierte Lernumgebung mit sicherer Benutzerverwaltung und Fortschrittsverfolgung.
+
+EN:
+This platform provides a modern, game-based learning environment with secure user management and progress tracking.
