@@ -1,7 +1,4 @@
-/* =========================
-   QUESTIONS
-   ⚠️ Remplace/colle ici TOUTES tes questions
-========================= */
+
 
 const easy = [
   { q: "I drink coffee in the _____.", a: ["Night", "Morning", "Week"], c: 1 },
@@ -71,9 +68,9 @@ const hard = [
   { q: "The task was _____ difficult.", a: ["so", "such", "too"], c: 2 }
 ];
 
-/* =========================
+/* 
    HELPERS
-========================= */
+ */
 
 function shuffle(array) {
   const arr = [...array];
@@ -89,7 +86,6 @@ function getPool(level) {
 }
 
 function getPlayerId() {
-  // Si tu as login: user = {id, username}
   const u = localStorage.getItem("user");
   if (u) {
     try {
@@ -106,9 +102,9 @@ function getPlayerId() {
   return id;
 }
 
-/* =========================
+/* 
    DOM
-========================= */
+ */
 
 const elQuiz = document.getElementById("quiz");
 const elAnswers = document.getElementById("answers");
@@ -127,15 +123,15 @@ const hintTime = document.getElementById("hintTime");
 const hintCount = document.getElementById("hintCount");
 const playerPill = document.getElementById("playerPill");
 
-/* =========================
+/* 
    STATE
-========================= */
+ */
 
 let selectedLevel = "easy";
 let maxQuestions = 10;
 let timePerQ = 15;
 
-let pool = [];        // ✅ pool de la partie (déjà random + slice, donc sans répétition)
+let pool = [];       
 let idx = 0;
 
 let score = 0;
@@ -147,9 +143,9 @@ let timer = null;
 let finished = false;
 let startAt = null;
 
-/* =========================
+/* 
    UI helpers
-========================= */
+ */ 
 
 function renderInfo() {
   elTimer.textContent = "Time: " + time;
@@ -187,9 +183,9 @@ function startTimer() {
   }, 1000);
 }
 
-/* =========================
+/* 
    GAME FLOW
-========================= */
+ */
 
 function startGame() {
   selectedLevel = selLevel.value;
@@ -204,7 +200,6 @@ function startGame() {
     return;
   }
 
-  // ✅ NO REPEAT: mélange puis on prend les X premières
   const shuffled = shuffle(fullPool);
   pool = shuffled.slice(0, Math.min(maxQuestions, shuffled.length));
 
@@ -230,7 +225,6 @@ function startGame() {
 function showQuestion() {
   if (finished) return;
 
-  // fin si on a fait toutes les questions du pool
   if (idx >= pool.length) {
     endGame();
     return;
@@ -324,9 +318,9 @@ function endGame() {
   showMsg("Sitzung beendet! Klicke auf Finish (Save).");
 }
 
-/* =========================
+/* 
    SAVE TO DB
-========================= */
+ */
 
 async function saveSession() {
   const durationSec = startAt ? Math.floor((Date.now() - startAt) / 1000) : 0;
@@ -348,9 +342,9 @@ async function saveSession() {
   });
 }
 
-/* =========================
+/* 
    EVENTS
-========================= */
+ */
 
 selCount.addEventListener("change", (e) => {
   maxQuestions = Number(e.target.value);
@@ -376,9 +370,9 @@ elSave.addEventListener("click", async () => {
   showMsg("✅ Gespeichert!");
 });
 
-/* =========================
+/* 
    INIT
-========================= */
+ */
 
 (function init() {
   const pid = getPlayerId();
