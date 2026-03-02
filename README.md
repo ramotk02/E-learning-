@@ -59,7 +59,7 @@ A **database was integrated** to handle secure login and to store and track each
 ### Backend
 - Node.js
 - Express
-- MySQL (mysql2)
+- phpmyadmin
 - JSON Web Token (JWT)
 - bcrypt
 - CORS
